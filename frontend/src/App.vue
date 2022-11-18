@@ -35,7 +35,12 @@ export default {
 
 <template>
   <div class="uk-width-1-1">
-    <div uk-sticky>
+    <div v-if="loading" class="spinner-outer">
+      <div class="spinner-inner">
+        <div uk-spinner="ratio: 3"></div>
+      </div>
+    </div>
+    <div>
       <div class="uk-width-1-1 box navbar">
         <Menu />
       </div>
@@ -108,5 +113,20 @@ export default {
 .routerview-contents {
   padding: 30px;
   outline: solid 2px rgba(255, 255, 255, 1);
+}
+
+.spinner-outer {
+  z-index: 2;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.spinner-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -50px 0 0 -50px;
 }
 </style>

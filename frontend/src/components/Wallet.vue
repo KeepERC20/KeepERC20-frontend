@@ -2,6 +2,7 @@
 import {
   connectMetamask,
   addTokenToMetamask,
+  faucet,
   getAccount,
   getBalance,
 } from "../assets/js/interface_request.js";
@@ -74,7 +75,13 @@ export default {
       });
     },
     faucetOnClick: function () {
-        console.log("click faucetOnClick");
+      console.log("click faucetOnClick");
+      this.emitter.emit("loading-event", true);
+      faucet().then((success) => {
+        this.emitter.emit("loading-event", false);
+        if (success) this.updateBalance();
+        else console.log("fauacet fail!");
+      });
     },
     updateBalance: function () {
       if (getAccount() === "" || !this.connected) return;
@@ -102,7 +109,14 @@ export default {
           class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="connectOnClick"
         >
-          <span style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span
+            style="
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
+          >
             {{ btnText }}</span
           >
         </button>
@@ -111,7 +125,14 @@ export default {
           class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="faucetOnClick"
         >
-          <span style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span
+            style="
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
+          >
             {{ `FAUCET / ` + btnText }}</span
           >
         </button>
@@ -119,7 +140,14 @@ export default {
           class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="addToken('ERC')"
         >
-          <span style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span
+            style="
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
+          >
             {{ `TERC20 / ` + formattedERC }}</span
           >
         </button>
@@ -127,7 +155,14 @@ export default {
           class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="addToken('KEEPERC')"
         >
-          <span style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span
+            style="
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
+          >
             {{ `KTERC20 / ` + formattedKEEPERC }}</span
           >
         </button>

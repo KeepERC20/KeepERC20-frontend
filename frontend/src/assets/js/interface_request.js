@@ -5,6 +5,7 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from "ethers";
 import { TOKEN_CONTRACT_ADDR, KEEP_TOKEN_FACTORY_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ADDR } from "./contract.js"
 import { TOKEN_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_CONTRACT_ABI } from "./contract.js"
+import { mint_contract } from "./contract_request.js"
 import { balanceOf_contract } from "./contract_request.js"
 
 //const ETHERS_MAX = ethers.constants.MaxUint256;
@@ -140,6 +141,14 @@ function getContractImg(contractName) {
     else if (contractName === "KEEPERC") return '';
 }
 
+/* send functions */
+async function faucet() {
+    let _contract = getContract("ERC");
+    if (_contract === '' || getAccount() === '') return 0;
+    let response = await mint_contract(_contract, getAccount(), ethers.utils.parseUnits("100", "ether"));
+    return response;
+}
+
 /* view functions */
 async function getBalance(contractName) {
     let _contract = getContract(contractName);
@@ -148,4 +157,5 @@ async function getBalance(contractName) {
     return ethers.BigNumber.from(response);
 }
 
-export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getBalance }
+export { faucet };
+export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getBalance };
