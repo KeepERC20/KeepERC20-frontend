@@ -1,8 +1,36 @@
-<script setup>
+<script>
+import { connectContract } from "./assets/js/interface_request.js";
 import { RouterLink, RouterView } from "vue-router";
 import Menu from "./components/Menu.vue";
+import Wallet from "./components/Wallet.vue";
 import SendView from "./views/SendView.vue";
 import HistoryView from "./views/HistoryView.vue";
+
+export default {
+  data() {
+    return {
+      connected: false,
+      loading: false,
+    };
+  },
+  components: {
+    Menu,
+    Wallet,
+    SendView,
+    HistoryView,
+  },
+  mounted() {
+    this.emitter.on("metamask-connect-event", (msg) => {
+      this.connected = msg;
+    });
+
+    this.emitter.on("loading-event", (msg) => {
+      this.loading = msg;
+    });
+
+    connectContract();
+  },
+};
 </script>
 
 <template>
@@ -15,12 +43,19 @@ import HistoryView from "./views/HistoryView.vue";
     <div class="uk-width-1-1 box no-padding-top">
       <div uk-grid>
         <div class="uk-width-3-4@m routerview-card">
-          <div class="uk-width-1-1 routerview-title">
-            <div class="title-text"><span>SEND</span></div>
-            <div class="title-text-right"><span>- X</span></div>
+          <div style="padding-bottom: 20px;">
+            <div class="uk-width-1-1">
+              <Wallet />
+            </div>
           </div>
-          <div class="uk-width-1-1 routerview-contents">
-            <SendView />
+          <div>
+            <div class="uk-width-1-1 routerview-title">
+              <div class="title-text"><span>SEND</span></div>
+              <div class="title-text-right"><span>- X</span></div>
+            </div>
+            <div class="uk-width-1-1 routerview-contents">
+              <SendView />
+            </div>
           </div>
         </div>
         <div class="uk-width-1-4@m">

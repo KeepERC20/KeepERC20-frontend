@@ -6,8 +6,8 @@ import History from "../components/History.vue";
   <div>
     <History />
     <div class="pixel-title">
-      <span class="pagination-left">&lt;&lt; NEW</span>
-      <span class="pagination-right">OLD >></span>
+      <span class="pagination-left">&lt;&lt; NEWER</span>
+      <span class="pagination-right">OLDER >></span>
     </div>
   </div>
 </template>

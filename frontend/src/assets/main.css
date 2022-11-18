@@ -23,6 +23,14 @@ a:hover {
     text-decoration: none;
 }
 
+.input-transparent {
+  background-color: transparent;
+}
+
+.contents {
+  font-size: 1.2rem;
+}
+
 .pixel-title {
     font-family: 'Silkscreen', cursive;
     font-weight: 400;

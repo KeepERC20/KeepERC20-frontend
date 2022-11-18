@@ -63,14 +63,6 @@
 </template>
 
 <style scoped>
-.input-transparent {
-  background-color: transparent;
-}
-
-.contents {
-  font-size: 1.2rem;
-}
-
 .uk-button-default {
   font-size: 1.2rem;
   color: white;
