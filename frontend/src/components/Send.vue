@@ -17,8 +17,8 @@ export default {
       myAccount: "",
       myWallet: "",
 
-      erc20: "-",
-      from: "-",
+      erc20: "",
+      from: "",
       to: "",
       value: ethers.BigNumber.from("0"),
       extra: ethers.utils.formatBytes32String(""),
@@ -161,7 +161,7 @@ export default {
           ><span style="color: red; font-size: 0.9rem">*</span>Erc20</label
         >
         <div class="uk-form-controls">
-          <select class="uk-select" id="form-stacked-select">
+          <select class="uk-select" :disabled="!connected">
             <option>{{ erc20 }}</option>
           </select>
         </div>
@@ -172,7 +172,7 @@ export default {
           ><span style="color: red; font-size: 0.9rem">*</span>From</label
         >
         <div class="uk-form-controls">
-          <select class="uk-select" v-model="from">
+          <select class="uk-select" v-model="from" :disabled="!connected">
             <option :value="myAccount">{{ myAccount }}</option>
             <option :value="myWallet" v-if="connected">{{ myWallet }}</option>
           </select>
@@ -189,6 +189,7 @@ export default {
             type="text"
             v-model="to"
             placeholder="ex) 0x01a8d7f.."
+            :disabled="!connected"
           />
         </div>
       </div>
@@ -203,6 +204,7 @@ export default {
             type="number"
             v-model="formattedValue"
             placeholder="ex) 100.0"
+            :disabled="!connected"
           />
         </div>
       </div>
@@ -215,6 +217,7 @@ export default {
             type="text"
             v-model="formattedExtra"
             placeholder="extra data (0x...)"
+            :disabled="!connected"
           />
         </div>
       </div>
@@ -229,6 +232,7 @@ export default {
             type="number"
             v-model="formattedBlocks"
             placeholder="execute after N block (ex. 300)"
+            :disabled="!connected"
           />
         </div>
       </div>
@@ -243,7 +247,7 @@ export default {
               v-model="functions"
               name="functions"
               v-bind:value="'S'"
-              :disabled="from !== myAccount"
+              :disabled="from !== myAccount || !connected"
             /><span class="radio-text"> Scheduled Transfer</span></label
           ><br />
           <label
@@ -253,7 +257,7 @@ export default {
               v-model="functions"
               name="functions"
               v-bind:value="'R'"
-              :disabled="from !== myAccount"
+              :disabled="from !== myAccount || !connected"
             /><span class="radio-text"> Recoverable Transfer</span></label
           ><br />
           <label
@@ -263,7 +267,7 @@ export default {
               v-model="functions"
               name="functions"
               v-bind:value="'E'"
-              :disabled="from === myAccount"
+              :disabled="from === myAccount || !connected"
             /><span class="radio-text"> Expirable Approve</span></label
           >
         </div>
@@ -302,6 +306,7 @@ export default {
       <button
         v-else
         class="pixel-title uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"
+        :disabled="!connected"
       >
         Please connect wallet
       </button>
