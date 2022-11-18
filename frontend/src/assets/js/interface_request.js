@@ -5,8 +5,8 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from "ethers";
 import { TOKEN_CONTRACT_ADDR, KEEP_TOKEN_FACTORY_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ADDR } from "./contract.js"
 import { TOKEN_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_CONTRACT_ABI } from "./contract.js"
-import { mint_contract, approve_contract, queueScheduledTransferWithExtra_contract, queueRecoverableTransferWithExtra_contract } from "./contract_request.js"
-import { balanceOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract } from "./contract_request.js"
+import { mint_contract, createWallet_contract, approve_contract, queueScheduledTransferWithExtra_contract, queueRecoverableTransferWithExtra_contract, queueExpirableApprove_contract } from "./contract_request.js"
+import { balanceOf_contract, walletOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract } from "./contract_request.js"
 
 //const ETHERS_MAX = ethers.constants.MaxUint256;
 
@@ -162,6 +162,13 @@ async function faucet() {
     return response;
 }
 
+async function createWallet() {
+    let _contract = getContract("KEEPERC");
+    if (_contract === '' || getAccount() === '') return 0;
+    let response = await createWallet_contract(_contract, getAccount());
+    return response;
+}
+
 async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
     let _contract = getContract("KEEPERC");
     if (_contract === '' || getAccount() === '') return 0;
@@ -170,7 +177,7 @@ async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
     console.log(_erc20, _from, _to, _value, _extra, _blocks, _function)
     if ( _function === 'S' ) response = await queueScheduledTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
     else if ( _function === 'R' ) response = await queueRecoverableTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
-    //else if ( _function === 'E' ) response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
+    else if ( _function === 'E' ) response = await queueExpirableApprove_contract(_contract, getAccount(), _to, _value, _blocks);
     //else response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
     return response;
 }
@@ -188,6 +195,13 @@ async function getBalance(contractName) {
     if (_contract === '' || getAccount() === '') return 0;
     let response = await balanceOf_contract(_contract, getAccount());
     return ethers.BigNumber.from(response);
+}
+
+async function getWalletAddress() {
+    let _contract = getContract("KEEPERC");
+    if (_contract === '' || getAccount() === '') return 0;
+    let response = await walletOf_contract(_contract, getAccount());
+    return response; // address
 }
 
 async function getAllowance(contractName) {
@@ -213,5 +227,5 @@ async function getTask(_tid) {
     return response; // task object
 }
 
-export { faucet, submit, approveMax };
-export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getStringFromTypes, getStringFromStatus, getBalance, getAllowance, getActiveTasks, getTask };
+export { faucet, createWallet, submit, approveMax };
+export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getStringFromTypes, getStringFromStatus, getBalance, getWalletAddress, getAllowance, getActiveTasks, getTask };

@@ -6,6 +6,13 @@ async function mint_contract(_contract, _account, _amount) {
     return response;
 }
 
+async function createWallet_contract(_contract, _account) {
+    console.log("-- [request] createWallet");
+    let response = await _contract.methods.createWallet().send({ from: _account });
+    console.log("-- [response] createWallet :", response);
+    return response;
+}
+
 async function approve_contract(_contract, _account, _spender, _amount) {
     console.log("-- [request] approve");
     let response = await _contract.methods.approve(_spender, _amountl).send({ from: _account });
@@ -27,9 +34,21 @@ async function queueRecoverableTransferWithExtra_contract(_contract, _account, _
     return response;
 }
 
+async function queueExpirableApprove_contract(_contract, _account, _spender, _amount, _interval) {
+    console.log("-- [request] queueExpirableApprove");
+    let response = await _contract.methods.queueExpirableApprove(_spender, _amount, _interval).send({ from: _account });
+    console.log("-- [response] queueExpirableApprove :", response);
+    return response;
+}
+
 /* view */
 async function balanceOf_contract(_contract, _account) {
     let response = await _contract.methods.balanceOf(_account).call();
+    return response;
+}
+
+async function walletOf_contract(_contract, _account) {
+    let response = await _contract.methods.walletOf(_account).call();
     return response;
 }
 
@@ -48,5 +67,5 @@ async function tasks_contract(_contract, _tid) {
     return response;
 }
 
-export { mint_contract, approve_contract, queueScheduledTransferWithExtra_contract, queueRecoverableTransferWithExtra_contract };
-export { balanceOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract };
+export { mint_contract, createWallet_contract, approve_contract, queueScheduledTransferWithExtra_contract, queueRecoverableTransferWithExtra_contract, queueExpirableApprove_contract };
+export { balanceOf_contract, walletOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract };

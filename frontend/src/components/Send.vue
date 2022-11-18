@@ -1,8 +1,10 @@
 <script>
 import {
   getAccount,
+  getWalletAddress,
   getAllowance,
   approveMax,
+  createWallet,
   submit,
 } from "../assets/js/interface_request.js";
 import { TOKEN_CONTRACT_ADDR } from "../assets/js/contract.js";
@@ -12,6 +14,8 @@ export default {
     return {
       connected: false,
       approval_erc20: false,
+      myAccount: "",
+      myWallet: "",
 
       erc20: "-",
       from: "-",
@@ -92,6 +96,12 @@ export default {
       if (this.connected) {
         this.erc20 = TOKEN_CONTRACT_ADDR;
         this.from = getAccount();
+        this.myAccount = getAccount();
+        getWalletAddress().then((result) => {
+          this.myWallet = result;
+          if (result === "0x0000000000000000000000000000000000000000")
+            this.myWallet = "Create Wallet";
+        });
       }
       /*
       getTrustLevel().then((result) => {
@@ -130,6 +140,15 @@ export default {
         else console.log("submit fail!");
       });
     },
+    CreateWalletOnClick: function () {
+      console.log("click CreateWalletOnClick");
+      this.emitter.emit("loading-event", true);
+      createWallet().then((result) => {
+        this.emitter.emit("loading-event", false);
+        if (result) this.updateValues();
+        else console.log("create wallet fail!");
+      });
+    },
   },
 };
 </script>
@@ -150,12 +169,12 @@ export default {
 
       <div class="uk-margin">
         <label class="pixel-title" for="form-stacked-select"
-          ><span style="color: red; font-size: 0.9rem">*</span>From</label
+          ><span style="color: red; font-size: 0.9rem">*</span>From{{ from }}</label
         >
         <div class="uk-form-controls">
-          <select class="uk-select" id="form-stacked-select">
-            <option>{{ from }}</option>
-            <option v-if="connected">Create Wallet</option>
+          <select class="uk-select" v-model="from">
+            <option :value="myAccount">{{ myAccount }}</option>
+            <option :value="myWallet" v-if="connected">{{ myWallet }}</option>
           </select>
         </div>
       </div>
@@ -224,6 +243,7 @@ export default {
               v-model="functions"
               name="functions"
               v-bind:value="'S'"
+              :disabled="from !== myAccount"
             /><span class="radio-text"> Scheduled Transfer</span></label
           ><br />
           <label
@@ -233,6 +253,7 @@ export default {
               v-model="functions"
               name="functions"
               v-bind:value="'R'"
+              :disabled="from !== myAccount"
             /><span class="radio-text"> Recoverable Transfer</span></label
           ><br />
           <label
@@ -242,6 +263,7 @@ export default {
               v-model="functions"
               name="functions"
               v-bind:value="'E'"
+              :disabled="from === myAccount"
             /><span class="radio-text"> Expirable Approve</span></label
           >
         </div>
@@ -257,7 +279,14 @@ export default {
     </p-->
     <div>
       <button
-        v-if="approval_erc20"
+        v-if="from === 'Create Wallet'"
+        class="pixel-title uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"
+        @click="CreateWalletOnClick"
+      >
+        Create Wallet
+      </button>
+      <button
+        v-else-if="approval_erc20 || functions === 'E'"
         class="pixel-title uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"
         @click="submitOnClick"
       >
