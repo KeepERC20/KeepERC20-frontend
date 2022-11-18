@@ -173,15 +173,23 @@ export default {
 
 <style scoped>
 .uk-button-default {
-  border: 2px solid #e5e5e5;
+  outline: 2px solid #e5e5e5;
   color: white;
   max-height: 40px;
   font-size: 0.8rem;
 }
 
+/*
 .uk-button-default:hover {
   border: 2px solid #e5e5e5;
   color: white;
   font-size: 0.9rem;
+}
+*/
+
+.uk-button-default:hover {
+  border: 2px solid #e5e5e5;
+  background-color: #e5e5e5;
+  color: black;
 }
 </style>
