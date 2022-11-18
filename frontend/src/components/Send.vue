@@ -1,20 +1,28 @@
 <script>
-import { getAccount } from "../assets/js/interface_request.js";
+import {
+  getAccount,
+  getAllowance,
+  approveMax,
+  submit,
+} from "../assets/js/interface_request.js";
 import { TOKEN_CONTRACT_ADDR } from "../assets/js/contract.js";
 import { ethers } from "ethers";
 export default {
   data() {
     return {
       connected: false,
+      approval_erc20: false,
 
       erc20: "-",
       from: "-",
       to: "",
       value: ethers.BigNumber.from("0"),
-      extra: "",
+      extra: ethers.utils.formatBytes32String(""),
       blocks: ethers.BigNumber.from("0"),
+      functions: "",
 
       value_format: "",
+      extra_format: "",
       blocks_format: "",
     };
   },
@@ -30,13 +38,23 @@ export default {
         this.value = ethers.utils.parseUnits(sValue, "ether");
       },
     },
+    formattedExtra: {
+      get() {
+        return this.extra_format;
+      },
+      set(value) {
+        this.extra_format = value;
+        if (value === "") this.extra = ethers.utils.formatBytes32String(value);
+        else this.extra = value;
+      },
+    },
     formattedBlocks: {
       get() {
         return this.blocks_format;
       },
       set(value) {
         let sValue = value.toString();
-        this.value_format = sValue;
+        this.blocks_format = sValue;
         if (sValue === "") sValue = "0";
         this.blocks = ethers.BigNumber.from(sValue);
       },
@@ -61,19 +79,13 @@ export default {
   methods: {
     checkAllowance: function () {
       console.log("Check Allowance");
-      /*
-      getAllowance("WETH").then((allowance_weth) => {
-        console.log("allowance_weth", allowance_weth);
-        if (allowance_weth && !allowance_weth.isZero()) {
-          this.approval_weth = true;
-          getAllowance("FOXS").then((allowance_foxs) => {
-            if (allowance_foxs && !allowance_foxs.isZero()) {
-              this.approval_foxs = true;
-            }
-          });
+      getAllowance("ERC").then((allowance) => {
+        console.log("allowance", allowance);
+        if (allowance && !allowance.isZero()) {
+          console.log("allowance : ", allowance);
+          this.approval_erc20 = true;
         }
       });
-      */
     },
     updateValues: function () {
       console.log("Update Value");
@@ -90,6 +102,34 @@ export default {
       });
       */
     },
+    approveOnClick: function () {
+      console.log("approveOnClick (approval_erc20) : ", this.approval_erc20);
+      if (!this.approval_erc20) {
+        this.emitter.emit("loading-event", true);
+        approveMax("ERC").then((success) => {
+          this.emitter.emit("loading-event", false);
+          if (success) this.approval_erc20 = true;
+          else this.approval_erc20 = false;
+        });
+      }
+    },
+    submitOnClick: function () {
+      console.log("click submitOnClick");
+      this.emitter.emit("loading-event", true);
+      submit(
+        this.erc20,
+        this.from,
+        this.to,
+        this.value,
+        this.extra,
+        this.blocks,
+        this.functions
+      ).then((success) => {
+        this.emitter.emit("loading-event", false);
+        if (success) this.updateValues();
+        else console.log("submit fail!");
+      });
+    },
   },
 };
 </script>
@@ -98,7 +138,9 @@ export default {
   <div class="pixel-text contents">
     <form class="uk-form-stacked">
       <div class="uk-margin">
-        <label class="pixel-title" for="form-stacked-select">Erc20</label>
+        <label class="pixel-title" for="form-stacked-select"
+          ><span style="color: red; font-size: 0.9rem">*</span>Erc20</label
+        >
         <div class="uk-form-controls">
           <select class="uk-select" id="form-stacked-select">
             <option>{{ erc20 }}</option>
@@ -107,7 +149,9 @@ export default {
       </div>
 
       <div class="uk-margin">
-        <label class="pixel-title" for="form-stacked-select">From</label>
+        <label class="pixel-title" for="form-stacked-select"
+          ><span style="color: red; font-size: 0.9rem">*</span>From</label
+        >
         <div class="uk-form-controls">
           <select class="uk-select" id="form-stacked-select">
             <option>{{ from }}</option>
@@ -117,7 +161,9 @@ export default {
       </div>
 
       <div class="uk-margin">
-        <label class="pixel-title" for="form-stacked-text">To</label>
+        <label class="pixel-title" for="form-stacked-text"
+          ><span style="color: red; font-size: 0.9rem">*</span>To</label
+        >
         <div class="uk-form-controls">
           <input
             class="uk-input"
@@ -129,7 +175,9 @@ export default {
       </div>
 
       <div class="uk-margin">
-        <label class="pixel-title" for="form-stacked-text">Value</label>
+        <label class="pixel-title" for="form-stacked-text"
+          ><span style="color: red; font-size: 0.9rem">*</span>Value</label
+        >
         <div class="uk-form-controls">
           <input
             class="uk-input"
@@ -146,14 +194,16 @@ export default {
           <input
             class="uk-input"
             type="text"
-            v-model="extra"
+            v-model="formattedExtra"
             placeholder="extra data (0x...)"
           />
         </div>
       </div>
 
       <div class="uk-margin">
-        <label class="pixel-title" for="form-stacked-text">Blocks</label>
+        <label class="pixel-title" for="form-stacked-text"
+          ><span style="color: red; font-size: 0.9rem">*</span>Blocks</label
+        >
         <div class="uk-form-controls">
           <input
             class="uk-input"
@@ -167,10 +217,33 @@ export default {
       <div class="uk-margin">
         <div class="pixel-title">Function</div>
         <div class="uk-form-controls">
-          <label><input class="uk-radio" type="radio" name="radio1" /><span class="radio-text"> Scheduled Transfer</span></label
+          <label
+            ><input
+              class="uk-radio"
+              type="radio"
+              v-model="functions"
+              name="functions"
+              v-bind:value="'S'"
+            /><span class="radio-text"> Scheduled Transfer</span></label
           ><br />
-          <label><input class="uk-radio" type="radio" name="radio1" /><span class="radio-text"> Recoverable Transfer</span></label><br />
-          <label><input class="uk-radio" type="radio" name="radio1" /><span class="radio-text"> Expirable Approve</span></label>
+          <label
+            ><input
+              class="uk-radio"
+              type="radio"
+              v-model="functions"
+              name="functions"
+              v-bind:value="'R'"
+            /><span class="radio-text"> Recoverable Transfer</span></label
+          ><br />
+          <label
+            ><input
+              class="uk-radio"
+              type="radio"
+              v-model="functions"
+              name="functions"
+              v-bind:value="'E'"
+            /><span class="radio-text"> Expirable Approve</span></label
+          >
         </div>
       </div>
     </form>
@@ -184,9 +257,24 @@ export default {
     </p-->
     <div>
       <button
+        v-if="approval_erc20"
         class="pixel-title uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"
+        @click="submitOnClick"
       >
         Submit
+      </button>
+      <button
+        v-else-if="connected"
+        class="pixel-title uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"
+        @click="approveOnClick"
+      >
+        Approve
+      </button>
+      <button
+        v-else
+        class="pixel-title uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"
+      >
+        Please connect to wallet
       </button>
     </div>
   </div>

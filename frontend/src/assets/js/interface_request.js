@@ -5,8 +5,8 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from "ethers";
 import { TOKEN_CONTRACT_ADDR, KEEP_TOKEN_FACTORY_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ADDR } from "./contract.js"
 import { TOKEN_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_CONTRACT_ABI } from "./contract.js"
-import { mint_contract } from "./contract_request.js"
-import { balanceOf_contract } from "./contract_request.js"
+import { mint_contract, approve_contract, queueScheduledTransferWithExtra_contract } from "./contract_request.js"
+import { balanceOf_contract, allowance_contract } from "./contract_request.js"
 
 //const ETHERS_MAX = ethers.constants.MaxUint256;
 
@@ -149,6 +149,26 @@ async function faucet() {
     return response;
 }
 
+async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
+    let _contract = getContract("KEEPERC");
+    if (_contract === '' || getAccount() === '') return 0;
+
+    let response;
+    console.log(_erc20, _from, _to, _value, _extra, _blocks, _function)
+    if ( _function === 'S' ) response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
+    //else if ( _function === 'R' ) response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
+    //else if ( _function === 'E' ) response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
+    //else response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
+    return response;
+}
+
+async function approveMax(contractName) {
+    let _contract = getContract(contractName);
+    if (_contract === '' || getAccount() === '') return 0;
+    let response = await approve_contract(_contract, getAccount(), KEEP_TOKEN_CONTRACT_ADDR, ethers.constants.MaxUint256);
+    return response;
+}
+
 /* view functions */
 async function getBalance(contractName) {
     let _contract = getContract(contractName);
@@ -157,5 +177,12 @@ async function getBalance(contractName) {
     return ethers.BigNumber.from(response);
 }
 
-export { faucet };
-export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getBalance };
+async function getAllowance(contractName) {
+    let _contract = getContract(contractName);
+    if (_contract === '' || getAccount() === '') return 0;
+    let response = await allowance_contract(_contract, getAccount(), KEEP_TOKEN_CONTRACT_ADDR);
+    return ethers.BigNumber.from(response);
+}
+
+export { faucet, submit, approveMax };
+export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getBalance, getAllowance };
