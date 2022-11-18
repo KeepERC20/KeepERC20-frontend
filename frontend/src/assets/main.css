@@ -23,6 +23,14 @@ a:hover {
   text-decoration: none;
 }
 
+.block-text {
+  display: block;
+  overflow: auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap:break-word;
+}
+
 .underline-links:hover {
   text-decoration: underline;
 }

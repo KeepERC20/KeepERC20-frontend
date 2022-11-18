@@ -11,8 +11,8 @@ export default {
   data() {
     return {
       connected: false,
-      btnText: "Connect",
-      btnTooltip: "Connect",
+      btnText: "Connect Wallet",
+      btnTooltip: "Connect Wallet",
 
       erc: ethers.BigNumber.from(0),
       keeperc: ethers.BigNumber.from(0),

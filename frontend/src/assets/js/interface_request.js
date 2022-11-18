@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { TOKEN_CONTRACT_ADDR, KEEP_TOKEN_FACTORY_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ADDR } from "./contract.js"
 import { TOKEN_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_CONTRACT_ABI } from "./contract.js"
 import { mint_contract, approve_contract, queueScheduledTransferWithExtra_contract } from "./contract_request.js"
-import { balanceOf_contract, allowance_contract } from "./contract_request.js"
+import { balanceOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract } from "./contract_request.js"
 
 //const ETHERS_MAX = ethers.constants.MaxUint256;
 
@@ -141,6 +141,19 @@ function getContractImg(contractName) {
     else if (contractName === "KEEPERC") return '';
 }
 
+function getStringFromTypes(nTypes) {
+    if (nTypes === '0') return "Scheduled Transfer";
+    if (nTypes === '1') return "Recoverable Transfer";
+    if (nTypes === '2') return "Expirable Approve";
+    return "Unknown";
+}
+
+function getStringFromStatus(bActive) {
+    if (bActive === false) return "Executed";
+    if (bActive === true) return "Pending";
+    return "Unknown";
+}
+
 /* send functions */
 async function faucet() {
     let _contract = getContract("ERC");
@@ -184,5 +197,21 @@ async function getAllowance(contractName) {
     return ethers.BigNumber.from(response);
 }
 
+async function getActiveTasks() {
+    let _contract = getContract("KEEPERC");
+    if (_contract === '' || getAccount() === '') return 0;
+    let response = await activeTasksOf_contract(_contract, getAccount());
+    //console.log("List of task id.", response);
+    return response; // list of task id
+}
+
+async function getTask(_tid) {
+    let _contract = getContract("KEEPERC");
+    if (_contract === '') return 0;
+    let response = await tasks_contract(_contract, _tid);
+    //console.log("Got task object.", response);
+    return response; // task object
+}
+
 export { faucet, submit, approveMax };
-export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getBalance, getAllowance };
+export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getStringFromTypes, getStringFromStatus, getBalance, getAllowance, getActiveTasks, getTask };

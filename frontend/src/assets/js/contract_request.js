@@ -31,5 +31,15 @@ async function allowance_contract(_contract, _owner, _spender) {
     return response;
 }
 
+async function activeTasksOf_contract(_contract, _account) {
+    let response = await _contract.methods.tasksOf(_account).call();
+    return response;
+}
+
+async function tasks_contract(_contract, _tid) {
+    let response = await _contract.methods.tasks(_tid).call();
+    return response;
+}
+
 export { mint_contract, approve_contract, queueScheduledTransferWithExtra_contract };
-export { balanceOf_contract, allowance_contract };
+export { balanceOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract };

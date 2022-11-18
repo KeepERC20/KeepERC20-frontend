@@ -274,7 +274,7 @@ export default {
         v-else
         class="pixel-title uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"
       >
-        Please connect to wallet
+        Please connect wallet
       </button>
     </div>
   </div>
