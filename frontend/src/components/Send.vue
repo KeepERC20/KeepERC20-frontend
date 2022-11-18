@@ -169,7 +169,7 @@ export default {
 
       <div class="uk-margin">
         <label class="pixel-title" for="form-stacked-select"
-          ><span style="color: red; font-size: 0.9rem">*</span>From{{ from }}</label
+          ><span style="color: red; font-size: 0.9rem">*</span>From</label
         >
         <div class="uk-form-controls">
           <select class="uk-select" v-model="from">

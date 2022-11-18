@@ -15,7 +15,7 @@ async function createWallet_contract(_contract, _account) {
 
 async function approve_contract(_contract, _account, _spender, _amount) {
     console.log("-- [request] approve");
-    let response = await _contract.methods.approve(_spender, _amountl).send({ from: _account });
+    let response = await _contract.methods.approve(_spender, _amount).send({ from: _account });
     console.log("-- [response] approve :", response);
     return response;
 }

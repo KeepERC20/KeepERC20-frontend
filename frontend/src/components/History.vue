@@ -130,7 +130,7 @@ export default {
 <template>
   <div class="uk-width-1-1 routerview-card">
     <div class="uk-width-1-1 routerview-title">
-      <div class="title-text"><span>🔄 Tasks</span></div>
+      <div class="title-text"><span>Tasks</span></div>
 
       <div class="title-text-right"><span>- X</span></div>
     </div>
