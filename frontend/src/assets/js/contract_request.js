@@ -20,6 +20,13 @@ async function queueScheduledTransferWithExtra_contract(_contract, _account, _to
     return response;
 }
 
+async function queueRecoverableTransferWithExtra_contract(_contract, _account, _to, _amount, _extra, _interval) {
+    console.log("-- [request] queueRecoverableTransferWithExtra");
+    let response = await _contract.methods.queueRecoverableTransferWithExtra(_to, _amount, _extra, _interval).send({ from: _account });
+    console.log("-- [response] queueRecoverableTransferWithExtra :", response);
+    return response;
+}
+
 /* view */
 async function balanceOf_contract(_contract, _account) {
     let response = await _contract.methods.balanceOf(_account).call();
@@ -41,5 +48,5 @@ async function tasks_contract(_contract, _tid) {
     return response;
 }
 
-export { mint_contract, approve_contract, queueScheduledTransferWithExtra_contract };
+export { mint_contract, approve_contract, queueScheduledTransferWithExtra_contract, queueRecoverableTransferWithExtra_contract };
 export { balanceOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract };
