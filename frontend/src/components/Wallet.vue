@@ -105,6 +105,7 @@ export default {
     <div class="uk-width-1-1 routerview-card">
       <div class="uk-text-center wrap-top">
         <button
+          id="google-auth-btn"
           v-if="!connected"
           class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="connectOnClick"

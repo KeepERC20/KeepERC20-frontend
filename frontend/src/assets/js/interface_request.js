@@ -1,7 +1,6 @@
 /*
  * Declarations
  */
-import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from "ethers";
 import { TOKEN_CONTRACT_ADDR, KEEP_TOKEN_FACTORY_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ADDR } from "./contract.js"
 import { TOKEN_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_CONTRACT_ABI } from "./contract.js"
@@ -11,7 +10,10 @@ import { balanceOf_contract, walletOf_contract, allowance_contract, activeTasksO
 //const ETHERS_MAX = ethers.constants.MaxUint256;
 
 const mumbaiTestChainId = '0x13881';
-const mumbaiRPCUrl = 'https://polygon-testnet.public.blastapi.io';
+const mumbaiRPCUrl = 'https://rpc.ankr.com/polygon_mumbai';
+
+const provider = new ethers.providers.JsonRpcProvider(mumbaiRPCUrl);
+
 
 let account = '';
 let contract_erc = '';
@@ -30,67 +32,77 @@ async function connectContract() {
     console.log("connect to contract done.");
 }
 
+// async function connectMetamask() {
+//     // metamask installed
+//     const provider = await detectEthereumProvider();
+//     if (provider) {
+//         try {
+//             await provider.request({
+//                 method: 'wallet_switchEthereumChain',
+//                 params: [{ chainId: mumbaiTestChainId }],
+//             });
+//             console.log("You have succefully switched to Mumbai Test network");
+
+//             // set global variables (contract, account)
+//             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+//             account = accounts[0];
+//             return true;
+//         } catch (switchError) {
+//             console.log("Failed to switch to the network");
+
+//             // This error code indicates that the chain has not been added to MetaMask.
+//             if (switchError.code === 4902) {
+//                 try {
+//                     console.log("This network is not available in your metamask, please add it");
+
+//                     await provider.request({
+//                         method: 'wallet_addEthereumChain',
+//                         params: [
+//                             {
+//                                 chainId: mumbaiTestChainId,
+//                                 chainName: 'Mumbai',
+//                                 rpcUrls: [mumbaiRPCUrl],
+//                                 blockExplorerUrls: [],
+//                                 nativeCurrency: {
+//                                     symbol: 'MATIC',
+//                                     decimals: 18
+//                                 }
+//                             }
+//                         ]
+//                     });
+
+//                     // connect
+//                     await provider.request({
+//                         method: 'wallet_switchEthereumChain',
+//                         params: [{ chainId: mumbaiTestChainId }],
+//                     });
+//                     console.log("You have succefully switched to Mumbai Test network");
+
+//                     // set global variables (contract, account)
+//                     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+//                     account = accounts[0];
+//                     return true;
+//                 } catch (addError) {
+//                     console.log(addError);
+//                 }
+//             }
+//         }
+//     } else {
+//         // If window.ethereum is not found then MetaMask is not installed
+//         alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
+//     }
+//     return false;
+// }
+
 async function connectMetamask() {
-    // metamask installed
-    const provider = await detectEthereumProvider();
-    if (provider) {
-        try {
-            await provider.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: mumbaiTestChainId }],
-            });
-            console.log("You have succefully switched to Mumbai Test network");
-
-            // set global variables (contract, account)
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            account = accounts[0];
-            return true;
-        } catch (switchError) {
-            console.log("Failed to switch to the network");
-
-            // This error code indicates that the chain has not been added to MetaMask.
-            if (switchError.code === 4902) {
-                try {
-                    console.log("This network is not available in your metamask, please add it");
-
-                    await provider.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [
-                            {
-                                chainId: mumbaiTestChainId,
-                                chainName: 'Mumbai',
-                                rpcUrls: [mumbaiRPCUrl],
-                                blockExplorerUrls: [],
-                                nativeCurrency: {
-                                    symbol: 'MATIC',
-                                    decimals: 18
-                                }
-                            }
-                        ]
-                    });
-
-                    // connect
-                    await provider.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: mumbaiTestChainId }],
-                    });
-                    console.log("You have succefully switched to Mumbai Test network");
-
-                    // set global variables (contract, account)
-                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                    account = accounts[0];
-                    return true;
-                } catch (addError) {
-                    console.log(addError);
-                }
-            }
-        }
-    } else {
-        // If window.ethereum is not found then MetaMask is not installed
-        alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
-    }
-    return false;
+    provider.getBalance("0x5e144EE53C6f3305362bdA2bC019081405bC2C80").then((balance) => {
+        // convert a currency unit from wei to ether
+        const balanceInEth = ethers.utils.formatEther(balance)
+        console.log(`balance: ${balanceInEth} ETH`)
+    });
 }
+
+//////
 
 async function addTokenToMetamask(tokenName) {
     const tokenContract = getContract(tokenName);
@@ -175,9 +187,9 @@ async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
 
     let response;
     console.log(_erc20, _from, _to, _value, _extra, _blocks, _function)
-    if ( _function === 'S' ) response = await queueScheduledTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
-    else if ( _function === 'R' ) response = await queueRecoverableTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
-    else if ( _function === 'E' ) response = await queueExpirableApprove_contract(_contract, getAccount(), _to, _value, _blocks);
+    if (_function === 'S') response = await queueScheduledTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
+    else if (_function === 'R') response = await queueRecoverableTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
+    else if (_function === 'E') response = await queueExpirableApprove_contract(_contract, getAccount(), _to, _value, _blocks);
     //else response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
     return response;
 }
