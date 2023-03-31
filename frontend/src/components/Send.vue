@@ -5,7 +5,6 @@ import {
   getAllowance,
   approveMax,
   createWallet,
-  checkValidity,
   submit,
 } from "../assets/js/interface_request.js";
 import { isTargetPhising } from "../assets/js/fds.js";

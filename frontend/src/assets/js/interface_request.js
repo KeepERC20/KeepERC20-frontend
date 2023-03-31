@@ -89,9 +89,9 @@ function getContractImg(contractName) {
 }
 
 function getStringFromTypes(nTypes) {
-    if (nTypes === '0') return "Scheduled Transfer";
-    if (nTypes === '1') return "Recoverable Transfer";
-    if (nTypes === '2') return "Expirable Approve";
+    if (nTypes == 0) return "Scheduled Transfer";
+    if (nTypes == 1) return "Recoverable Transfer";
+    if (nTypes == 2) return "Expirable Approve";
     return "Unknown";
 }
 
@@ -170,6 +170,7 @@ async function getActiveTasks() {
     if (_contract === '' || getAddress() === '') return 0;
     let response = await activeTasksOf_contract(_contract, getAddress());
     // console.log("List of task id.", response);
+    response = response.map(bn => bn.toString());
     return response; // list of task id
 }
 
@@ -177,7 +178,7 @@ async function getTask(_tid) {
     let _contract = getContract("KEEPERC");
     if (_contract === '') return 0;
     let response = await tasks_contract(_contract, _tid);
-    //console.log("Got task object.", response);
+    // console.log("Got task object.", response);
     return response; // task object
 }
 

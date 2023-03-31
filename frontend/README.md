@@ -12,8 +12,8 @@ Wallet
 - [ ] Copy Address
 
 Task
-- [ ] fix Type: UNKNOWN
-- [ ] Update History breaks current Task #N
+- [x] fix Type: UNKNOWN
+- [x] Update History breaks current Task #N
 
 UI/UX
 - [ ] 'x' button on 'TYPE PASSWORD'
