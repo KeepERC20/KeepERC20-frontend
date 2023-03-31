@@ -21,13 +21,30 @@ let contract_keeperc = '';
 // load from chrome extension local storage
 async function loadAccounts() {
     const result = await chrome.storage.local.get(['accounts']);
-    accounts = result.accounts;
-    // console.log('Account list loaded from local storage:', accounts);
+    accounts = result.accounts || [];
+    console.log('Account list loaded from local storage:', accounts);
     return accounts
 }
 
-async function addNewAccount() {
+// TODO: redundancy check
+async function createNewAccount() {
     const newWallet = ethers.Wallet.createRandom();
+    const newAccount = {
+        address: newWallet.address,
+        privateKey: newWallet.privateKey
+    };
+
+    accounts.push(newAccount);
+    await chrome.storage.local.set({ accounts: accounts }, function () {
+        console.log('Accounts saved to local storage', accounts);
+    });
+
+    return newAccount;
+}
+
+// TODO: redundancy check
+async function importNewAccount(privateKey) {
+    const newWallet = new ethers.Wallet(privateKey, provider);
     const newAccount = {
         address: newWallet.address,
         privateKey: newWallet.privateKey
@@ -124,6 +141,12 @@ async function approveMax(contractName) {
 }
 
 /* view functions */
+
+async function getETHBalance() {
+    const response = await provider.getBalance(getAddress());
+    return ethers.BigNumber.from(response);
+}
+
 async function getBalance(contractName) {
     let _contract = getContract(contractName);
     if (_contract === '' || getAddress() === '') return 0;
@@ -162,4 +185,4 @@ async function getTask(_tid) {
 }
 
 export { faucet, createWallet, submit, approveMax };
-export { loadAccounts, connectContract, setCurrentWallet, addNewAccount, getAddress, getStringFromTypes, getStringFromStatus, getBalance, getWalletAddress, getAllowance, getActiveTasks, getTask };
+export { loadAccounts, connectContract, setCurrentWallet, createNewAccount, importNewAccount, getAddress, getStringFromTypes, getStringFromStatus, getETHBalance, getBalance, getWalletAddress, getAllowance, getActiveTasks, getTask };
