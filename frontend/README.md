@@ -8,7 +8,6 @@ Wallet
 - [ ] Link Balance @subscription
 - [ ] ERC20/TERC20 selection & Show balance
 <!-- - [x] ERC20 Faucet -->
-- [ ] MATIC Faucet (link)
 - [ ] Copy Address
 
 <!-- Task
@@ -17,7 +16,7 @@ Wallet
 
 UI/UX
 <!-- - [x] 'x' button on 'TYPE PASSWORD' -->
-- [ ] Can cancle loading
+<!-- - [x] Can cancle loading -->
 - [ ] alert -> text
 - [ ] prompt -> card
 - [ ] Tooltips: "MATIC Faucet", "Faucet"
@@ -45,4 +44,4 @@ Etc
 - [x] Popup (not a new window)
 - [ ] Webpage (Station)
 - [ ] Various ico sizes (use photoshop)
-- [ ] Bot
+- [ ] Bot (ChatGPT -> type 1, 2, 3 -> send)

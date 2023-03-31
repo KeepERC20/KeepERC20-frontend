@@ -123,10 +123,12 @@ async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
 
     let response;
     // console.log(_erc20, _from, _to, _value, _extra, _blocks, _function)
+
     if (_function === 'S') response = await queueScheduledTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
     else if (_function === 'R') response = await queueRecoverableTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
     else if (_function === 'E') response = await queueExpirableApprove_contract(_contract, getAccount(), _to, _value, _blocks);
-    //else response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
+    // TODO: else response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
+
     return response;
 }
 

@@ -113,29 +113,53 @@ export default {
       });
       */
     },
-    approveOnClick: function () {
+    approveOnClick: async function () {
       console.log("approveOnClick (approval_erc20) : ", this.approval_erc20);
       if (!this.approval_erc20) {
         this.emitter.emit("loading-event", true);
-        approveMax("ERC").then((success) => {
-          this.emitter.emit("loading-event", false);
+        try {
+          const success = await approveMax("ERC");
           if (success) this.approval_erc20 = true;
           else this.approval_erc20 = false;
-        });
+        } catch {
+          console.log("Error!");
+        } finally {
+          this.emitter.emit("loading-event", false);
+        }
       }
     },
     submitOnClick: async function () {
       console.log("click submitOnClick");
       this.emitter.emit("loading-event", true);
-
-      console.log("this.to", this.to);
-
       if (await isTargetPhising(this.to)) {
         const confirmPopup = window.confirm(
           "The destination address is identified as a phishing address. Do you want to proceed?"
         );
         if (confirmPopup) {
-          submit(
+          try {
+            const success = await submit(
+              this.erc20,
+              this.from,
+              this.to,
+              this.value,
+              this.extra,
+              this.blocks,
+              this.functions
+            );
+            if (success) this.updateValues();
+            else console.log("submit fail!");
+          } catch {
+            console.log("Error!");
+          } finally {
+            this.emitter.emit("loading-event", false);
+          }
+        } else {
+          this.emitter.emit("loading-event", false);
+          console.log("submit cancle!");
+        }
+      } else {
+        try {
+          const success = await submit(
             this.erc20,
             this.from,
             this.to,
@@ -143,39 +167,28 @@ export default {
             this.extra,
             this.blocks,
             this.functions
-          ).then((success) => {
-            this.emitter.emit("loading-event", false);
-            if (success) this.updateValues();
-            else console.log("submit fail!");
-          });
-        } else {
-          this.emitter.emit("loading-event", false);
-          console.log("submit fail!");
-        }
-      } else {
-        submit(
-          this.erc20,
-          this.from,
-          this.to,
-          this.value,
-          this.extra,
-          this.blocks,
-          this.functions
-        ).then((success) => {
-          this.emitter.emit("loading-event", false);
+          );
           if (success) this.updateValues();
           else console.log("submit fail!");
-        });
+        } catch {
+          console.log("Error!");
+        } finally {
+          this.emitter.emit("loading-event", false);
+        }
       }
     },
-    CreateWalletOnClick: function () {
+    CreateWalletOnClick: async function () {
       console.log("click CreateWalletOnClick");
       this.emitter.emit("loading-event", true);
-      createWallet().then((result) => {
-        this.emitter.emit("loading-event", false);
+      try {
+        const result = await createWallet();
         if (result) this.updateValues();
         else console.log("create wallet fail!");
-      });
+      } catch {
+        console.log("Error!");
+      } finally {
+        this.emitter.emit("loading-event", false);
+      }
     },
   },
 };

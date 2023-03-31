@@ -170,12 +170,17 @@ export default {
 
       if (confirm("Are you sure you want to perform the faucet action?")) {
         this.emitter.emit("loading-event", true);
-        const success = await faucet();
-        if (success) {
+        try {
+          const success = await faucet();
+          if (success) {
+            this.updateBalance();
+          } else {
+            console.error("faucet fail!");
+          }
+        } catch {
+          console.log("Error!");
+        } finally {
           this.emitter.emit("loading-event", false);
-          this.updateBalance();
-        } else {
-          console.error("faucet fail!");
         }
       }
     },
@@ -215,7 +220,7 @@ export default {
           v-on:change="onAccountSelect"
         >
           <option :value="'Connect'" hidden style="color: white">
-            Connected
+            Choose Account
           </option>
           <optgroup label="Accounts">
             <option
