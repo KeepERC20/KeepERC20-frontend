@@ -165,7 +165,7 @@ export default {
     //   // click -> select
     // },
 
-    async faucetOnClick() {
+    async ERCfaucetOnClick() {
       if (getAddress() === "") return;
 
       if (confirm("Are you sure you want to perform the faucet action?")) {
@@ -176,13 +176,17 @@ export default {
             this.updateBalance();
           } else {
             console.error("faucet fail!");
+            alert("Fail to perform faucet action");
           }
         } catch {
-          console.log("Error!");
+          alert("Fail to perform faucet action");
         } finally {
           this.emitter.emit("loading-event", false);
         }
       }
+    },
+    async faucetOnClick() {
+      window.open("https://faucet.polygon.technology/");
     },
   },
 };
@@ -216,7 +220,11 @@ export default {
           v-if="accountsConnected"
           v-model="selectedValue"
           id="account-select"
-          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          :class="
+            selectedValue === 'Connect'
+              ? 'uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom login-button'
+              : 'uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom'
+          "
           v-on:change="onAccountSelect"
         >
           <option :value="'Connect'" hidden style="color: white">
@@ -243,8 +251,9 @@ export default {
 
         <!-- ETH BALANCE -->
         <button
-          uk-tooltip="Hello World"
+          uk-tooltip="Visit MATIC Faucet"
           class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          @click="faucetOnClick"
         >
           <span
             style="
@@ -260,8 +269,9 @@ export default {
 
         <!-- ERC20 -->
         <button
+          uk-tooltip="Click to Get TERC20"
           class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
-          @click="faucetOnClick()"
+          @click="ERCfaucetOnClick()"
         >
           <span
             style="
@@ -318,12 +328,12 @@ export default {
 }
 
 .login-button {
-  border: 2px solid #e5e5e5;
+  border: 2px solid #ffffff;
   background-color: rgb(255, 255, 255);
   color: rgb(0, 0, 0);
 }
 .login-button:hover {
-  border: 2px solid #e5e5e5;
+  border: 2px solid #ffffff;
   background-color: rgb(255, 255, 255);
   color: rgb(0, 0, 0);
 }

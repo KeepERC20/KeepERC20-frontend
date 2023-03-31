@@ -119,10 +119,14 @@ export default {
         this.emitter.emit("loading-event", true);
         try {
           const success = await approveMax("ERC");
-          if (success) this.approval_erc20 = true;
-          else this.approval_erc20 = false;
+          if (success) {
+            this.approval_erc20 = true;
+          } else {
+            this.approval_erc20 = false;
+            alert("Fail to Approve");
+          }
         } catch {
-          console.log("Error!");
+          alert("Fail to Approve");
         } finally {
           this.emitter.emit("loading-event", false);
         }
@@ -130,12 +134,39 @@ export default {
     },
     submitOnClick: async function () {
       console.log("click submitOnClick");
-      this.emitter.emit("loading-event", true);
-      if (await isTargetPhising(this.to)) {
-        const confirmPopup = window.confirm(
-          "The destination address is identified as a phishing address. Do you want to proceed?"
-        );
-        if (confirmPopup) {
+      if (confirm("Are you sure you want to make a transaction?")) {
+        this.emitter.emit("loading-event", true);
+        if (await isTargetPhising(this.to)) {
+          const confirmPopup = window.confirm(
+            "The destination address is identified as a phishing address. Do you want to proceed?"
+          );
+          if (confirmPopup) {
+            try {
+              const success = await submit(
+                this.erc20,
+                this.from,
+                this.to,
+                this.value,
+                this.extra,
+                this.blocks,
+                this.functions
+              );
+              if (success) {
+                this.updateValues();
+              } else {
+                console.log("submit fail!");
+                alert("Incorrect Inputs");
+              }
+            } catch {
+              alert("Incorrect Inputs");
+            } finally {
+              this.emitter.emit("loading-event", false);
+            }
+          } else {
+            this.emitter.emit("loading-event", false);
+            console.log("submit cancle!");
+          }
+        } else {
           try {
             const success = await submit(
               this.erc20,
@@ -146,34 +177,17 @@ export default {
               this.blocks,
               this.functions
             );
-            if (success) this.updateValues();
-            else console.log("submit fail!");
+            if (success) {
+              this.updateValues();
+            } else {
+              console.log("submit fail!");
+              alert("Incorrect Inputs");
+            }
           } catch {
-            console.log("Error!");
+            alert("Incorrect Inputs");
           } finally {
             this.emitter.emit("loading-event", false);
           }
-        } else {
-          this.emitter.emit("loading-event", false);
-          console.log("submit cancle!");
-        }
-      } else {
-        try {
-          const success = await submit(
-            this.erc20,
-            this.from,
-            this.to,
-            this.value,
-            this.extra,
-            this.blocks,
-            this.functions
-          );
-          if (success) this.updateValues();
-          else console.log("submit fail!");
-        } catch {
-          console.log("Error!");
-        } finally {
-          this.emitter.emit("loading-event", false);
         }
       }
     },
@@ -182,10 +196,14 @@ export default {
       this.emitter.emit("loading-event", true);
       try {
         const result = await createWallet();
-        if (result) this.updateValues();
-        else console.log("create wallet fail!");
+        if (result) {
+          this.updateValues();
+        } else {
+          console.log("create wallet fail!");
+          alert("Fail to Create Wallet");
+        }
       } catch {
-        console.log("Error!");
+        alert("Fail to Create Wallet");
       } finally {
         this.emitter.emit("loading-event", false);
       }

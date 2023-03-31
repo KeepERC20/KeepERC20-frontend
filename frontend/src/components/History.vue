@@ -103,7 +103,8 @@ export default {
         this.currentTaskIndex += 1;
         this.currentTaskID = this.taskIDs[this.currentTaskIndex];
       } catch {
-        console.log("Error!");
+        // alert("Incorrect Inputs");
+        console.log("Fail to get newer task");
       } finally {
         this.emitter.emit("loading-event", false);
       }
@@ -127,7 +128,8 @@ export default {
         this.currentTaskIndex -= 1;
         this.currentTaskID = this.taskIDs[this.currentTaskIndex];
       } catch {
-        console.log("Error!");
+        // alert("Incorrect Inputs");
+        console.log("Fail to get older task");
       } finally {
         this.emitter.emit("loading-event", false);
       }
