@@ -116,38 +116,50 @@ export default {
       console.log("approveOnClick (approval_erc20) : ", this.approval_erc20);
       if (!this.approval_erc20) {
         this.emitter.emit("loading-event", true);
-        approveMax("ERC").then((success) => {
+        try {
+          approveMax("ERC").then((success) => {
+            if (success) this.approval_erc20 = true;
+            else this.approval_erc20 = false;
+          });
+        } catch {
+        } finally {
           this.emitter.emit("loading-event", false);
-          if (success) this.approval_erc20 = true;
-          else this.approval_erc20 = false;
-        });
+        }
       }
     },
     submitOnClick: function () {
       console.log("click submitOnClick");
       this.emitter.emit("loading-event", true);
-      submit(
-        this.erc20,
-        this.from,
-        this.to,
-        this.value,
-        this.extra,
-        this.blocks,
-        this.functions
-      ).then((success) => {
+      try {
+        submit(
+          this.erc20,
+          this.from,
+          this.to,
+          this.value,
+          this.extra,
+          this.blocks,
+          this.functions
+        ).then((success) => {
+          if (success) this.updateValues();
+          else console.log("submit fail!");
+        });
+      } catch {
+      } finally {
         this.emitter.emit("loading-event", false);
-        if (success) this.updateValues();
-        else console.log("submit fail!");
-      });
+      }
     },
     CreateWalletOnClick: function () {
       console.log("click CreateWalletOnClick");
       this.emitter.emit("loading-event", true);
-      createWallet().then((result) => {
+      try {
+        createWallet().then((result) => {
+          if (result) this.updateValues();
+          else console.log("create wallet fail!");
+        });
+      } catch {
+      } finally {
         this.emitter.emit("loading-event", false);
-        if (result) this.updateValues();
-        else console.log("create wallet fail!");
-      });
+      }
     },
   },
 };

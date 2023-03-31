@@ -92,16 +92,20 @@ export default {
       )
         return;
       this.emitter.emit("loading-event", true);
-      getTask(this.taskIDs[this.currentTaskIndex + 1]).then((task) => {
+      try {
+        getTask(this.taskIDs[this.currentTaskIndex + 1]).then((task) => {
+          this.type = getStringFromTypes(task.taskType);
+          this.sender = task.sender;
+          this.receiver = task.receiver;
+          this.amount = task.amount;
+          this.extra = task.extraField;
+          this.currentTaskIndex += 1;
+          this.currentTaskID = this.taskIDs[this.currentTaskIndex];
+        });
+      } catch {
+      } finally {
         this.emitter.emit("loading-event", false);
-        this.type = getStringFromTypes(task.taskType);
-        this.sender = task.sender;
-        this.receiver = task.receiver;
-        this.amount = task.amount;
-        this.extra = task.extraField;
-        this.currentTaskIndex += 1;
-        this.currentTaskID = this.taskIDs[this.currentTaskIndex];
-      });
+      }
     },
     getOlderTask: function () {
       console.log("Get Older Task!");
@@ -112,16 +116,20 @@ export default {
       )
         return;
       this.emitter.emit("loading-event", true);
-      getTask(this.taskIDs[this.currentTaskIndex - 1]).then((task) => {
+      try {
+        getTask(this.taskIDs[this.currentTaskIndex - 1]).then((task) => {
+          this.type = getStringFromTypes(task.taskType);
+          this.sender = task.sender;
+          this.receiver = task.receiver;
+          this.amount = task.amount;
+          this.extra = task.extraField;
+          this.currentTaskIndex -= 1;
+          this.currentTaskID = this.taskIDs[this.currentTaskIndex];
+        });
+      } catch {
+      } finally {
         this.emitter.emit("loading-event", false);
-        this.type = getStringFromTypes(task.taskType);
-        this.sender = task.sender;
-        this.receiver = task.receiver;
-        this.amount = task.amount;
-        this.extra = task.extraField;
-        this.currentTaskIndex -= 1;
-        this.currentTaskID = this.taskIDs[this.currentTaskIndex];
-      });
+      }
     },
   },
 };
@@ -145,8 +153,12 @@ export default {
         <!--span class="pixel-title" style="display: block">· Status: {{ status }}</span-->
         <hr />
         <div class="pixel-title" style="padding-bottom: 20px">
-          <span v-if="currentTaskIndex < taskIDs.length - 1" class="pagination-left"
-            ><a class="underline-links" @click="getNewerTask">&lt;&lt; NEWER</a></span
+          <span
+            v-if="currentTaskIndex < taskIDs.length - 1"
+            class="pagination-left"
+            ><a class="underline-links" @click="getNewerTask"
+              >&lt;&lt; NEWER</a
+            ></span
           >
           <span v-if="currentTaskIndex > 0" class="pagination-right"
             ><a class="underline-links" @click="getOlderTask">OLDER >></a></span
@@ -154,10 +166,14 @@ export default {
         </div>
       </div>
       <div v-else-if="connected">
-        <span class="pixel-title" style="display: block">· No Active Tasks !</span>
+        <span class="pixel-title" style="display: block"
+          >· No Active Tasks !</span
+        >
       </div>
       <div v-else>
-        <span class="pixel-title" style="display: block">Please connect wallet !</span>
+        <span class="pixel-title" style="display: block"
+          >Please connect wallet !</span
+        >
       </div>
     </div>
   </div>

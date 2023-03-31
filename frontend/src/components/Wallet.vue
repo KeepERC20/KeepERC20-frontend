@@ -77,11 +77,15 @@ export default {
     faucetOnClick: function () {
       console.log("click faucetOnClick");
       this.emitter.emit("loading-event", true);
-      faucet().then((success) => {
+      try {
+        faucet().then((success) => {
+          if (success) this.updateBalance();
+          else console.log("fauacet fail!");
+        });
+      } catch {
+      } finally {
         this.emitter.emit("loading-event", false);
-        if (success) this.updateBalance();
-        else console.log("fauacet fail!");
-      });
+      }
     },
     updateBalance: function () {
       if (getAccount() === "" || !this.connected) return;
