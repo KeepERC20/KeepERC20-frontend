@@ -1,6 +1,6 @@
 <template>
-  <div v-if="!passwordEntered" class="password-overlay">
-    <div class="password-input uk-card uk-card-default uk-card-body">
+  <div v-if="!passwordEntered">
+    <div class="password-input">
       <h2 class="uk-card-title pixel-title">{{ title }}</h2>
       <input
         v-if="!hasPassword"
@@ -19,7 +19,8 @@
     </div>
   </div>
 </template>
-  <script>
+
+<script>
 export default {
   props: {
     showOverlay: {
@@ -42,7 +43,7 @@ export default {
     async checkPassword() {
       // Check if the password exists in the extension's local storage
       const password = (await chrome.storage.local.get(["password"])).password;
-      console.log(password, this.password, password==true);
+      console.log(password, this.password, password == true);
       if (password) {
         this.hasPassword = true;
         this.title = "Type Password";
@@ -77,7 +78,8 @@ export default {
   },
 };
 </script>
-  <style scoped>
+
+<style scoped>
 .password-overlay {
   position: fixed;
   top: 0;
@@ -92,10 +94,6 @@ export default {
 }
 
 .password-input {
-  background-color: #fff;
-  border-radius: 0px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  padding: 20px;
   text-align: center;
 }
 </style>

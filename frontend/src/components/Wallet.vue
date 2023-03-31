@@ -34,6 +34,7 @@ export default {
 
       showPasswordOverlay: false,
       accountsConnected: false,
+      modalClose: false,
     };
   },
   // watch: {
@@ -86,6 +87,7 @@ export default {
 
       this.showPasswordOverlay = false;
       this.accountsConnected = true;
+      this.modalClose = true;
     },
     async connectOnClick() {
       this.showPasswordOverlay = true;
@@ -183,17 +185,22 @@ export default {
 
 <template>
   <div>
-    <password-input
-      v-if="showPasswordOverlay"
-      @valid-password="onValidPassword"
-    ></password-input>
+    <!-- This is the modal with the default close button -->
+    <div v-if="!modalClose" id="modal-center" class="uk-flex-top" uk-modal>
+      <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <password-input @valid-password="onValidPassword"></password-input>
+      </div>
+    </div>
 
     <div class="uk-width-1-1 routerview-card">
       <div class="uk-text-center wrap-top">
         <!-- Connect Button -->
         <button
           v-if="!accountsConnected"
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom login-button"
+          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom login-button"
+          href="#modal-center"
+          uk-toggle
           @click="connectOnClick"
         >
           Login
@@ -204,7 +211,7 @@ export default {
           v-if="accountsConnected"
           v-model="selectedValue"
           id="account-select"
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           v-on:change="onAccountSelect"
         >
           <option :value="'Connect'" hidden style="color: white">
@@ -229,9 +236,26 @@ export default {
           </optgroup>
         </select>
 
+        <!-- ETH BALANCE -->
+        <button
+          uk-tooltip="Hello World"
+          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+        >
+          <span
+            style="
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
+          >
+            {{ `MATIC / ` + formattedETH }}
+          </span>
+        </button>
+
         <!-- ERC20 -->
         <button
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="faucetOnClick()"
         >
           <span
@@ -249,7 +273,7 @@ export default {
         <!-- KERC20 -->
         <!-- @click="addToken('KEEPERC')" -->
         <button
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
         >
           <span
             style="
@@ -269,9 +293,7 @@ export default {
           selectedValue !== 'ImportAccount' &&
           selectedValue !== 'Connect'
         "
-      >
-        {{ `Balance: ` + formattedETH }}
-      </div>
+      ></div>
     </div>
   </div>
 </template>

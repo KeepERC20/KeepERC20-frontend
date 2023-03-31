@@ -16,6 +16,10 @@
     "background": {
         "service_worker": "background.js"
     },
+    "action": {
+        "default_title": "KeeperC",
+        "default_popup": "index.html"
+    },
     "permissions": [
         "tabs",
         "management",

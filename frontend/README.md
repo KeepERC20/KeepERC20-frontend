@@ -1,22 +1,22 @@
 # TODO
 
 Wallet
-- [x] Address selection
+<!-- - [x] Address selection -->
 - [ ] Network selection (Through '...')
 - [ ] RPC enroll (Through '...')
-- [x] MATIC Balance
-<!-- - [ ] Link Balance w/ subscription -->
+<!-- - [x] MATIC Balance -->
+- [ ] Link Balance @subscription
 - [ ] ERC20/TERC20 selection & Show balance
-- [x] ERC20 Faucet
+<!-- - [x] ERC20 Faucet -->
 - [ ] MATIC Faucet (link)
 - [ ] Copy Address
 
-Task
+<!-- Task
 - [x] fix Type: UNKNOWN
-- [x] Update History breaks current Task #N
+- [x] Update History breaks current Task #N -->
 
 UI/UX
-- [ ] 'x' button on 'TYPE PASSWORD'
+<!-- - [x] 'x' button on 'TYPE PASSWORD' -->
 - [ ] Can cancle loading
 - [ ] alert -> text
 - [ ] prompt -> card
