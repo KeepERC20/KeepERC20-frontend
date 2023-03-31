@@ -4,6 +4,7 @@ import {
   addTokenToMetamask,
   faucet,
   getAccount,
+  getETHBalance,
   getBalance,
 } from "../assets/js/interface_request.js";
 import { ethers } from "ethers";
@@ -14,6 +15,7 @@ export default {
       btnText: "Connect Wallet",
       btnTooltip: "Connect Wallet",
 
+      eth: ethers.BigNumber.from(0),
       erc: ethers.BigNumber.from(0),
       keeperc: ethers.BigNumber.from(0),
 
@@ -21,6 +23,15 @@ export default {
     };
   },
   computed: {
+    formattedETH: {
+      get() {
+        let res = ethers.utils.formatEther(this.eth);
+        return (+res).toFixed(4);
+      },
+      set(value) {
+        this.eth = ethers.utils.parseUnits(value, "ether");
+      },
+    },
     formattedERC: {
       get() {
         let res = ethers.utils.formatEther(this.erc);
@@ -87,8 +98,12 @@ export default {
         this.emitter.emit("loading-event", false);
       }
     },
-    updateBalance: function () {
+    async ETHfaucetLinkOnClick() {
+      window.open("https://faucet.polygon.technology/");
+    },
+    updateBalance: async function () {
       if (getAccount() === "" || !this.connected) return;
+      this.eth = await getETHBalance();
       getBalance("ERC").then((result) => {
         this.erc = result;
       });
@@ -110,7 +125,7 @@ export default {
       <div class="uk-text-center wrap-top">
         <button
           v-if="!connected"
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="connectOnClick"
         >
           <span
@@ -126,7 +141,26 @@ export default {
         </button>
         <button
           v-if="connected"
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          uk-tooltip="Visit MATIC Faucet"
+          @click="ETHfaucetLinkOnClick"
+        >
+          <span
+            style="
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
+          >
+            {{ btnText }}</span
+          >
+        </button>
+
+        <!-- ETH BALANCE -->
+        <button
+          class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          uk-tooltip="Click to Get TERC20"
           @click="faucetOnClick"
         >
           <span
@@ -137,11 +171,12 @@ export default {
               white-space: nowrap;
             "
           >
-            {{ `FAUCET / ` + btnText }}</span
-          >
+            {{ `MATIC / ` + formattedETH }}
+          </span>
         </button>
+
         <button
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="addToken('ERC')"
         >
           <span
@@ -156,7 +191,7 @@ export default {
           >
         </button>
         <button
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
           @click="addToken('KEEPERC')"
         >
           <span

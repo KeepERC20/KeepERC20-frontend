@@ -175,9 +175,9 @@ async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
 
     let response;
     console.log(_erc20, _from, _to, _value, _extra, _blocks, _function)
-    if ( _function === 'S' ) response = await queueScheduledTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
-    else if ( _function === 'R' ) response = await queueRecoverableTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
-    else if ( _function === 'E' ) response = await queueExpirableApprove_contract(_contract, getAccount(), _to, _value, _blocks);
+    if (_function === 'S') response = await queueScheduledTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
+    else if (_function === 'R') response = await queueRecoverableTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
+    else if (_function === 'E') response = await queueExpirableApprove_contract(_contract, getAccount(), _to, _value, _blocks);
     //else response = await queueScheduledTransferWithExtra_contract(_contract, _from, _to, _value, _extra, _blocks);
     return response;
 }
@@ -190,6 +190,23 @@ async function approveMax(contractName) {
 }
 
 /* view functions */
+
+async function getETHBalance() {
+    if (!window.ethereum) return 0;
+
+    try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const address = await provider.getSigner().getAddress();
+        const balance = await provider.getBalance(address);
+
+        return balance;
+    } catch (err) {
+        console.error(err);
+        return 0;
+    }
+}
+
+
 async function getBalance(contractName) {
     let _contract = getContract(contractName);
     if (_contract === '' || getAccount() === '') return 0;
@@ -228,4 +245,4 @@ async function getTask(_tid) {
 }
 
 export { faucet, createWallet, submit, approveMax };
-export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getStringFromTypes, getStringFromStatus, getBalance, getWalletAddress, getAllowance, getActiveTasks, getTask };
+export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getStringFromTypes, getStringFromStatus, getETHBalance, getBalance, getWalletAddress, getAllowance, getActiveTasks, getTask };

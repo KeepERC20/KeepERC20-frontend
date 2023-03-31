@@ -7,6 +7,7 @@ import {
   createWallet,
   submit,
 } from "../assets/js/interface_request.js";
+import { isTargetPhising } from "../assets/js/fds.js";
 import { TOKEN_CONTRACT_ADDR } from "../assets/js/contract.js";
 import { ethers } from "ethers";
 export default {
@@ -127,25 +128,61 @@ export default {
         }
       }
     },
-    submitOnClick: function () {
+    submitOnClick: async function () {
       console.log("click submitOnClick");
       this.emitter.emit("loading-event", true);
-      try {
-        submit(
-          this.erc20,
-          this.from,
-          this.to,
-          this.value,
-          this.extra,
-          this.blocks,
-          this.functions
-        ).then((success) => {
-          if (success) this.updateValues();
-          else console.log("submit fail!");
-        });
-      } catch {
-      } finally {
-        this.emitter.emit("loading-event", false);
+      if (await isTargetPhising(this.to)) {
+        const confirmPopup = window.confirm(
+          "The destination address is identified as a phishing address. Do you want to proceed?"
+        );
+        if (confirmPopup) {
+          try {
+            const success = await submit(
+              this.erc20,
+              this.from,
+              this.to,
+              this.value,
+              this.extra,
+              this.blocks,
+              this.functions
+            );
+            if (success) {
+              this.updateValues();
+            } else {
+              console.log("submit fail!");
+              alert("Incorrect Inputs");
+            }
+          } catch {
+            alert("Incorrect Inputs");
+          } finally {
+            this.emitter.emit("loading-event", false);
+          }
+        } else {
+          this.emitter.emit("loading-event", false);
+          console.log("submit cancle!");
+        }
+      } else {
+        try {
+          const success = await submit(
+            this.erc20,
+            this.from,
+            this.to,
+            this.value,
+            this.extra,
+            this.blocks,
+            this.functions
+          );
+          if (success) {
+            this.updateValues();
+          } else {
+            console.log("submit fail!");
+            alert("Incorrect Inputs");
+          }
+        } catch {
+          alert("Incorrect Inputs");
+        } finally {
+          this.emitter.emit("loading-event", false);
+        }
       }
     },
     CreateWalletOnClick: function () {
