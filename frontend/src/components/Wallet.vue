@@ -142,8 +142,8 @@ export default {
         <button
           v-if="connected"
           class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
-          uk-tooltip="Visit MATIC Faucet"
-          @click="ETHfaucetLinkOnClick"
+          uk-tooltip="Click to Get TERC20"
+          @click="faucetOnClick"
         >
           <span
             style="
@@ -153,15 +153,15 @@ export default {
               white-space: nowrap;
             "
           >
-            {{ btnText }}</span
+            {{ `FAUCET / ` + btnText }}</span
           >
         </button>
 
         <!-- ETH BALANCE -->
         <button
           class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
-          uk-tooltip="Click to Get TERC20"
-          @click="faucetOnClick"
+          uk-tooltip="Visit MATIC Faucet"
+          @click="ETHfaucetLinkOnClick"
         >
           <span
             style="
