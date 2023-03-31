@@ -8,6 +8,7 @@ Wallet
 <!-- - [ ] Link Balance w/ subscription -->
 - [ ] ERC20/TERC20 selection & Show balance
 - [x] ERC20 Faucet
+- [ ] MATIC Faucet (link)
 - [ ] Copy Address
 
 UI/UX

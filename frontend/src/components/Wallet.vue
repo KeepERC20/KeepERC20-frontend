@@ -97,20 +97,32 @@ export default {
         const newAccount = await createNewAccount();
         this.accounts = await loadAccounts();
         this.selectedValue = newAccount.privateKey; // update
-        this.startUpdatingBalance();
-        this.emitter.emit("account-connect-event", true);
-        // this.emitter.emit("account-connect-event", false); // TODO: when fail
+        setCurrentWallet(this.selectedValue).then((success) => {
+          if (success) {
+            this.startUpdatingBalance();
+            this.emitter.emit("account-connect-event", true);
+          } else {
+            console.log("connection failed!");
+            this.emitter.emit("account-connect-event", false);
+          }
+        });
       } else if (selectedOption == "ImportAccount") {
         const input = prompt("Enter your private key:");
         if (input) {
           const newAccount = await importNewAccount(input);
           this.accounts = await loadAccounts();
           this.selectedValue = newAccount.privateKey; // update
-          this.startUpdatingBalance();
-          this.emitter.emit("account-connect-event", true);
+          setCurrentWallet(this.selectedValue).then((success) => {
+            if (success) {
+              this.startUpdatingBalance();
+              this.emitter.emit("account-connect-event", true);
+            } else {
+              console.log("connection failed!");
+              this.emitter.emit("account-connect-event", false);
+            }
+          });
         } else {
           console.log("No input provided");
-          // this.emitter.emit("account-connect-event", false); // TODO: when fail
         }
       } else {
         console.log("PrivateKey", selectedOption);
@@ -132,6 +144,7 @@ export default {
       }
     },
     async updateBalance() {
+      console.log("updateBalance:", getAddress());
       if (getAddress() === "") return;
       this.eth = await getETHBalance();
       this.erc = await getBalance("ERC");
