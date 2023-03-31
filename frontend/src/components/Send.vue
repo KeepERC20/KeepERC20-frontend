@@ -5,8 +5,10 @@ import {
   getAllowance,
   approveMax,
   createWallet,
+  checkValidity,
   submit,
 } from "../assets/js/interface_request.js";
+import { isTargetPhising } from "../assets/js/fds.js";
 import { TOKEN_CONTRACT_ADDR } from "../assets/js/contract.js";
 import { ethers } from "ethers";
 export default {
@@ -123,22 +125,49 @@ export default {
         });
       }
     },
-    submitOnClick: function () {
+    submitOnClick: async function () {
       console.log("click submitOnClick");
       this.emitter.emit("loading-event", true);
-      submit(
-        this.erc20,
-        this.from,
-        this.to,
-        this.value,
-        this.extra,
-        this.blocks,
-        this.functions
-      ).then((success) => {
-        this.emitter.emit("loading-event", false);
-        if (success) this.updateValues();
-        else console.log("submit fail!");
-      });
+
+      console.log("this.to", this.to);
+
+      if (await isTargetPhising(this.to)) {
+        const confirmPopup = window.confirm(
+          "The destination address is identified as a phishing address. Do you want to proceed?"
+        );
+        if (confirmPopup) {
+          submit(
+            this.erc20,
+            this.from,
+            this.to,
+            this.value,
+            this.extra,
+            this.blocks,
+            this.functions
+          ).then((success) => {
+            this.emitter.emit("loading-event", false);
+            if (success) this.updateValues();
+            else console.log("submit fail!");
+          });
+        } else {
+          this.emitter.emit("loading-event", false);
+          console.log("submit fail!");
+        }
+      } else {
+        submit(
+          this.erc20,
+          this.from,
+          this.to,
+          this.value,
+          this.extra,
+          this.blocks,
+          this.functions
+        ).then((success) => {
+          this.emitter.emit("loading-event", false);
+          if (success) this.updateValues();
+          else console.log("submit fail!");
+        });
+      }
     },
     CreateWalletOnClick: function () {
       console.log("click CreateWalletOnClick");

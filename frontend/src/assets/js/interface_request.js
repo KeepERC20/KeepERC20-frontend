@@ -4,8 +4,6 @@ import { TOKEN_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_CONTRAC
 import { mint_contract, createWallet_contract, approve_contract, queueScheduledTransferWithExtra_contract, queueRecoverableTransferWithExtra_contract, queueExpirableApprove_contract } from "./contract_request.js"
 import { balanceOf_contract, walletOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract } from "./contract_request.js"
 
-// const ETHERS_MAX = ethers.constants.MaxUint256;
-
 const mumbaiTestChainId = '0x13881';
 const mumbaiRPCUrl = 'https://rpc.ankr.com/polygon_mumbai';
 const provider = new ethers.providers.JsonRpcProvider(mumbaiRPCUrl); // TODO: selection
@@ -70,8 +68,6 @@ async function connectContract() {
     contract_keeperc = new ethers.Contract(KEEP_TOKEN_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ABI, provider);
 }
 
-//////
-
 function getAddress() {
     return currentAddress;
 }
@@ -106,6 +102,7 @@ function getStringFromStatus(bActive) {
 }
 
 /* send functions */
+
 async function faucet() {
     let _contract = getContract("ERC");
     if (_contract === '' || getAddress() === '') return 0;

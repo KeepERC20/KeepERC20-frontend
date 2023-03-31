@@ -11,6 +11,10 @@ Wallet
 - [ ] MATIC Faucet (link)
 - [ ] Copy Address
 
+Task
+- [ ] fix Type: UNKNOWN
+- [ ] Update History breaks current Task #N
+
 UI/UX
 - [ ] 'x' button on 'TYPE PASSWORD'
 - [ ] Can cancle loading
@@ -33,7 +37,7 @@ Security
 
 Allowlist/Denylist
 - [ ] Add/Remove
-- [ ] Warning (2-hop, default)
+- [x] Warning (based on phishing-address, based on etherscan tag)
 <!-- - [ ] Long-term TODO: FDS by GNN. Via Chainlink Functions? -->
 
 Etc
