@@ -20,10 +20,6 @@ export default {
     HistoryView,
   },
   mounted() {
-    this.emitter.on("metamask-connect-event", (msg) => {
-      this.connected = msg;
-    });
-
     this.emitter.on("loading-event", (msg) => {
       this.loading = msg;
     });
@@ -48,7 +44,7 @@ export default {
     <div class="uk-width-1-1 box no-padding-top">
       <div uk-grid>
         <div class="uk-width-3-4@m routerview-card">
-          <div style="padding-bottom: 20px;">
+          <div style="padding-bottom: 20px">
             <div class="uk-width-1-1">
               <Wallet />
             </div>

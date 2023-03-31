@@ -1,9 +1,10 @@
 <script>
 import {
-  connectMetamask,
-  addTokenToMetamask,
+  setCurrentWallet,
+  addNewAccount,
   faucet,
-  getAccount,
+  loadAccounts,
+  getAddress,
   getBalance,
 } from "../assets/js/interface_request.js";
 import { ethers } from "ethers";
@@ -11,14 +12,23 @@ export default {
   data() {
     return {
       connected: false,
-      btnText: "Connect Wallet",
-      btnTooltip: "Connect Wallet",
+      // TODO: btnTooltip: "Connect Wallet",
 
-      erc: ethers.BigNumber.from(0),
-      keeperc: ethers.BigNumber.from(0),
+      erc: ethers.BigNumber.from(0), // balance
+      keeperc: ethers.BigNumber.from(0), // balance
 
-      intervalid: "",
+      // TODO: created vs computed
+      // can be update
+      accounts: [],
+
+      selectedValue: "Connect",
     };
+  },
+  // watch: {
+
+  // },
+  async created() {
+    this.accounts = await loadAccounts();
   },
   computed: {
     formattedERC: {
@@ -41,60 +51,58 @@ export default {
     },
   },
   mounted() {
-    this.emitter.on("metamask-connect-event", (msg) => {
+    this.emitter.on("account-connect-event", (msg) => {
       this.connected = msg;
-      if (this.connected) {
-        let account = getAccount();
-        this.btnText = account;
-        this.btnTooltip = account;
-      }
-      this.updateBalance();
     });
   },
   methods: {
-    connectOnClick: function () {
-      if (getAccount() !== "") return;
-      connectMetamask().then((success) => {
-        if (success) {
-          console.log("metamask successfully connected!");
-          this.emitter.emit("metamask-connect-event", true);
+    async connectOnClick(event) {
+      const selectedOption = event.target.value;
+      if (selectedOption == "CreateAccount") {
+        const newAccount = await addNewAccount();
+        this.accounts = await loadAccounts();
+        this.selectedValue = newAccount.privateKey; // update
+        this.emitter.emit("account-connect-event", true);
+        // this.emitter.emit("account-connect-event", false); // TODO
+      } else if (selectedOption == "ImportAccount") {
+        console.log("ImportAccount"); // TODO
+      } else {
+        console.log("PrivateKey", selectedOption); // or Connect
+        setCurrentWallet(selectedOption).then((success) => {
+          if (success) {
+            this.startUpdatingBalance();
+            this.emitter.emit("account-connect-event", true);
+          } else {
+            console.log("connection failed!");
+            this.emitter.emit("account-connect-event", false);
+          }
+        });
+      }
+    },
+    async startUpdatingBalance() {
+      while (true) {
+        await this.updateBalance();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    },
+    async updateBalance() {
+      if (getAddress() === "") return;
+      this.erc = await getBalance("ERC");
+      this.keeperc = await getBalance("KEEPERC");
+    },
 
-          // update balance
-          this.intervalid = setInterval(
-            function () {
-              this.updateBalance();
-            }.bind(this),
-            3000
-          );
-        } else {
-          console.log("metamask connection failed!");
-          this.btnTest = "metamask required!";
-          this.btnTooltip = "metamask required!";
-          this.emitter.emit("metamask-connect-event", false);
-        }
-      });
-    },
-    faucetOnClick: function () {
-      console.log("click faucetOnClick");
+    // async addToken(tokenName) {
+    //   // click -> select
+    // },
+
+    async faucetOnClick() {
       this.emitter.emit("loading-event", true);
-      faucet().then((success) => {
+
+      const success = await faucet();
+      if (success) {
         this.emitter.emit("loading-event", false);
-        if (success) this.updateBalance();
-        else console.log("fauacet fail!");
-      });
-    },
-    updateBalance: function () {
-      if (getAccount() === "" || !this.connected) return;
-      getBalance("ERC").then((result) => {
-        this.erc = result;
-      });
-      getBalance("KEEPERC").then((result) => {
-        this.keeperc = result;
-      });
-      console.log("UpdateBalance!");
-    },
-    addToken: function (tokenName) {
-      addTokenToMetamask(tokenName);
+        this.updateBalance();
+      } else console.error("faucet fail!");
     },
   },
 };
@@ -104,11 +112,39 @@ export default {
   <div>
     <div class="uk-width-1-1 routerview-card">
       <div class="uk-text-center wrap-top">
-        <button
-          id="google-auth-btn"
-          v-if="!connected"
+        <!-- Accounts -->
+        <select
+          v-model="selectedValue"
+          id="account-select"
           class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
-          @click="connectOnClick"
+          v-on:change="connectOnClick"
+        >
+          <option :value="'Connect'" hidden style="color: white">
+            Connect
+          </option>
+          <optgroup label="Accounts">
+            <option
+              v-for="account in accounts"
+              :value="account.privateKey"
+              :key="account.address"
+            >
+              <!-- TODO: ... / LINK balance -->
+              {{ account.address }}
+            </option>
+          </optgroup>
+          <optgroup label="Managing">
+            <!-- TODO: add (get private key) -->
+            <option :value="'CreateAccount'" @click="changeSelectedOption">
+              Create Account
+            </option>
+            <option :value="'ImportAccount'">Import Account</option>
+          </optgroup>
+        </select>
+
+        <!-- ERC20 -->
+        <!-- @click="addToken('ERC')" -->
+        <button
+          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
         >
           <span
             style="
@@ -118,13 +154,14 @@ export default {
               white-space: nowrap;
             "
           >
-            {{ btnText }}</span
-          >
+            {{ `TERC20 / ` + formattedERC }}
+          </span>
         </button>
+
+        <!-- KERC20 -->
+        <!-- @click="addToken('KEEPERC')" -->
         <button
-          v-if="connected"
           class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
-          @click="faucetOnClick"
         >
           <span
             style="
@@ -134,38 +171,8 @@ export default {
               white-space: nowrap;
             "
           >
-            {{ `FAUCET / ` + btnText }}</span
-          >
-        </button>
-        <button
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
-          @click="addToken('ERC')"
-        >
-          <span
-            style="
-              display: block;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            "
-          >
-            {{ `TERC20 / ` + formattedERC }}</span
-          >
-        </button>
-        <button
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
-          @click="addToken('KEEPERC')"
-        >
-          <span
-            style="
-              display: block;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            "
-          >
-            {{ `KTERC20 / ` + formattedKEEPERC }}</span
-          >
+            {{ `KTERC20 / ` + formattedKEEPERC }}
+          </span>
         </button>
       </div>
     </div>
@@ -179,14 +186,6 @@ export default {
   max-height: 40px;
   font-size: 0.8rem;
 }
-
-/*
-.uk-button-default:hover {
-  border: 2px solid #e5e5e5;
-  color: white;
-  font-size: 0.9rem;
-}
-*/
 
 .uk-button-default:hover {
   border: 2px solid #e5e5e5;

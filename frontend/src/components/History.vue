@@ -1,6 +1,6 @@
 <script>
 import {
-  getAccount,
+  getAddress,
   getStringFromTypes,
   getStringFromStatus,
   getActiveTasks,
@@ -27,7 +27,7 @@ export default {
     };
   },
   mounted() {
-    this.emitter.on("metamask-connect-event", (msg) => {
+    this.emitter.on("account-connect-event", (msg) => {
       this.connected = msg;
       if (this.connected) {
         this.updateValues();
@@ -42,7 +42,7 @@ export default {
       }
     });
 
-    if (getAccount() !== "") {
+    if (getAddress() !== "") {
       this.connected = true;
     }
 

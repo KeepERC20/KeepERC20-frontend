@@ -1,144 +1,66 @@
-/*
- * Declarations
- */
 import { ethers } from "ethers";
 import { TOKEN_CONTRACT_ADDR, KEEP_TOKEN_FACTORY_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ADDR } from "./contract.js"
 import { TOKEN_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_CONTRACT_ABI } from "./contract.js"
 import { mint_contract, createWallet_contract, approve_contract, queueScheduledTransferWithExtra_contract, queueRecoverableTransferWithExtra_contract, queueExpirableApprove_contract } from "./contract_request.js"
 import { balanceOf_contract, walletOf_contract, allowance_contract, activeTasksOf_contract, tasks_contract } from "./contract_request.js"
 
-//const ETHERS_MAX = ethers.constants.MaxUint256;
+// const ETHERS_MAX = ethers.constants.MaxUint256;
 
 const mumbaiTestChainId = '0x13881';
 const mumbaiRPCUrl = 'https://rpc.ankr.com/polygon_mumbai';
+const provider = new ethers.providers.JsonRpcProvider(mumbaiRPCUrl); // TODO: selection
 
-const provider = new ethers.providers.JsonRpcProvider(mumbaiRPCUrl);
+let accounts = [];
+let currentAccount = undefined; // global, current
+let currentAddress = ''; // global, current
 
-
-let account = '';
 let contract_erc = '';
 let contract_factory = '';
 let contract_keeperc = '';
 
-/* 
- * Initialize functions
- */
-async function connectContract() {
-    console.log("connect to contract!");
-    window.web3 = new Web3(window.ethereum);
-    contract_erc = await new window.web3.eth.Contract(TOKEN_CONTRACT_ABI, TOKEN_CONTRACT_ADDR);
-    contract_factory = await new window.web3.eth.Contract(KEEP_TOKEN_FACTORY_CONTRACT_ABI, KEEP_TOKEN_FACTORY_CONTRACT_ADDR);
-    contract_keeperc = await new window.web3.eth.Contract(KEEP_TOKEN_CONTRACT_ABI, KEEP_TOKEN_CONTRACT_ADDR);
-    console.log("connect to contract done.");
+// load from chrome extension local storage
+async function loadAccounts() {
+    const result = await chrome.storage.local.get(['accounts']);
+    accounts = result.accounts;
+    // console.log('Account list loaded from local storage:', accounts);
+    return accounts
 }
 
-// async function connectMetamask() {
-//     // metamask installed
-//     const provider = await detectEthereumProvider();
-//     if (provider) {
-//         try {
-//             await provider.request({
-//                 method: 'wallet_switchEthereumChain',
-//                 params: [{ chainId: mumbaiTestChainId }],
-//             });
-//             console.log("You have succefully switched to Mumbai Test network");
+async function addNewAccount() {
+    const newWallet = ethers.Wallet.createRandom();
+    const newAccount = {
+        address: newWallet.address,
+        privateKey: newWallet.privateKey
+    };
 
-//             // set global variables (contract, account)
-//             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-//             account = accounts[0];
-//             return true;
-//         } catch (switchError) {
-//             console.log("Failed to switch to the network");
-
-//             // This error code indicates that the chain has not been added to MetaMask.
-//             if (switchError.code === 4902) {
-//                 try {
-//                     console.log("This network is not available in your metamask, please add it");
-
-//                     await provider.request({
-//                         method: 'wallet_addEthereumChain',
-//                         params: [
-//                             {
-//                                 chainId: mumbaiTestChainId,
-//                                 chainName: 'Mumbai',
-//                                 rpcUrls: [mumbaiRPCUrl],
-//                                 blockExplorerUrls: [],
-//                                 nativeCurrency: {
-//                                     symbol: 'MATIC',
-//                                     decimals: 18
-//                                 }
-//                             }
-//                         ]
-//                     });
-
-//                     // connect
-//                     await provider.request({
-//                         method: 'wallet_switchEthereumChain',
-//                         params: [{ chainId: mumbaiTestChainId }],
-//                     });
-//                     console.log("You have succefully switched to Mumbai Test network");
-
-//                     // set global variables (contract, account)
-//                     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-//                     account = accounts[0];
-//                     return true;
-//                 } catch (addError) {
-//                     console.log(addError);
-//                 }
-//             }
-//         }
-//     } else {
-//         // If window.ethereum is not found then MetaMask is not installed
-//         alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
-//     }
-//     return false;
-// }
-
-async function connectMetamask() {
-    provider.getBalance("0x5e144EE53C6f3305362bdA2bC019081405bC2C80").then((balance) => {
-        // convert a currency unit from wei to ether
-        const balanceInEth = ethers.utils.formatEther(balance)
-        console.log(`balance: ${balanceInEth} ETH`)
+    accounts.push(newAccount);
+    await chrome.storage.local.set({ accounts: accounts }, function () {
+        console.log('Accounts saved to local storage', accounts);
     });
+
+    return newAccount;
+}
+
+async function setCurrentWallet(privateKey) {
+    currentAccount = new ethers.Wallet(privateKey, provider);
+    currentAddress = currentAccount.address;
+    return true;
+}
+
+async function connectContract() {
+    contract_erc = new ethers.Contract(TOKEN_CONTRACT_ADDR, TOKEN_CONTRACT_ABI, provider);
+    contract_factory = new ethers.Contract(KEEP_TOKEN_FACTORY_CONTRACT_ADDR, KEEP_TOKEN_FACTORY_CONTRACT_ABI, provider);
+    contract_keeperc = new ethers.Contract(KEEP_TOKEN_CONTRACT_ADDR, KEEP_TOKEN_CONTRACT_ABI, provider);
 }
 
 //////
 
-async function addTokenToMetamask(tokenName) {
-    const tokenContract = getContract(tokenName);
-    const symbol = await tokenContract.methods.symbol().call();
-    const decimals = await tokenContract.methods.decimals().call();
-    const tokenImage = getContractImg(tokenName);
-
-    const provider = window.ethereum;
-    if (provider) {
-        try {
-            // wasAdded is a boolean. Like any RPC method, an error may be thrown.
-            const wasAdded = await provider.request({
-                method: 'wallet_watchAsset',
-                params: {
-                    type: 'ERC20',
-                    options: {
-                        address: tokenContract._address,
-                        symbol: symbol,
-                        decimals: decimals,
-                        image: tokenImage,
-                    },
-                },
-            });
-            if (wasAdded) {
-                console.log('Thanks for your interest!');
-            } else {
-                console.log('Your loss!');
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+function getAddress() {
+    return currentAddress;
 }
 
 function getAccount() {
-    return account;
+    return currentAccount;
 }
 
 function getContract(contractName) {
@@ -169,24 +91,24 @@ function getStringFromStatus(bActive) {
 /* send functions */
 async function faucet() {
     let _contract = getContract("ERC");
-    if (_contract === '' || getAccount() === '') return 0;
+    if (_contract === '' || getAddress() === '') return 0;
     let response = await mint_contract(_contract, getAccount(), ethers.utils.parseUnits("100", "ether"));
     return response;
 }
 
 async function createWallet() {
     let _contract = getContract("KEEPERC");
-    if (_contract === '' || getAccount() === '') return 0;
+    if (_contract === '' || getAddress() === '') return 0;
     let response = await createWallet_contract(_contract, getAccount());
     return response;
 }
 
 async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
     let _contract = getContract("KEEPERC");
-    if (_contract === '' || getAccount() === '') return 0;
+    if (_contract === '' || getAddress() === '') return 0;
 
     let response;
-    console.log(_erc20, _from, _to, _value, _extra, _blocks, _function)
+    // console.log(_erc20, _from, _to, _value, _extra, _blocks, _function)
     if (_function === 'S') response = await queueScheduledTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
     else if (_function === 'R') response = await queueRecoverableTransferWithExtra_contract(_contract, getAccount(), _to, _value, _extra, _blocks);
     else if (_function === 'E') response = await queueExpirableApprove_contract(_contract, getAccount(), _to, _value, _blocks);
@@ -196,7 +118,7 @@ async function submit(_erc20, _from, _to, _value, _extra, _blocks, _function) {
 
 async function approveMax(contractName) {
     let _contract = getContract(contractName);
-    if (_contract === '' || getAccount() === '') return 0;
+    if (_contract === '' || getAddress() === '') return 0;
     let response = await approve_contract(_contract, getAccount(), KEEP_TOKEN_CONTRACT_ADDR, ethers.constants.MaxUint256);
     return response;
 }
@@ -204,30 +126,30 @@ async function approveMax(contractName) {
 /* view functions */
 async function getBalance(contractName) {
     let _contract = getContract(contractName);
-    if (_contract === '' || getAccount() === '') return 0;
-    let response = await balanceOf_contract(_contract, getAccount());
+    if (_contract === '' || getAddress() === '') return 0;
+    let response = await balanceOf_contract(_contract, getAddress());
     return ethers.BigNumber.from(response);
 }
 
 async function getWalletAddress() {
     let _contract = getContract("KEEPERC");
-    if (_contract === '' || getAccount() === '') return 0;
-    let response = await walletOf_contract(_contract, getAccount());
+    if (_contract === '' || getAddress() === '') return 0;
+    let response = await walletOf_contract(_contract, getAddress());
     return response; // address
 }
 
 async function getAllowance(contractName) {
     let _contract = getContract(contractName);
-    if (_contract === '' || getAccount() === '') return 0;
-    let response = await allowance_contract(_contract, getAccount(), KEEP_TOKEN_CONTRACT_ADDR);
+    if (_contract === '' || getAddress() === '') return 0;
+    let response = await allowance_contract(_contract, getAddress(), KEEP_TOKEN_CONTRACT_ADDR);
     return ethers.BigNumber.from(response);
 }
 
 async function getActiveTasks() {
     let _contract = getContract("KEEPERC");
-    if (_contract === '' || getAccount() === '') return 0;
-    let response = await activeTasksOf_contract(_contract, getAccount());
-    console.log("List of task id.", response);
+    if (_contract === '' || getAddress() === '') return 0;
+    let response = await activeTasksOf_contract(_contract, getAddress());
+    // console.log("List of task id.", response);
     return response; // list of task id
 }
 
@@ -240,4 +162,4 @@ async function getTask(_tid) {
 }
 
 export { faucet, createWallet, submit, approveMax };
-export { connectContract, connectMetamask, addTokenToMetamask, getAccount, getStringFromTypes, getStringFromStatus, getBalance, getWalletAddress, getAllowance, getActiveTasks, getTask };
+export { loadAccounts, connectContract, setCurrentWallet, addNewAccount, getAddress, getStringFromTypes, getStringFromStatus, getBalance, getWalletAddress, getAllowance, getActiveTasks, getTask };

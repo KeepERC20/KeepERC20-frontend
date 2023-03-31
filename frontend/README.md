@@ -2,8 +2,8 @@
 
 Selection & Show: Header
 - [ ] Network selection
-- [ ] Address selection
-- [ ] Link Balance
+- [x] Address selection
+<!-- - [ ] Link Balance -->
 - [ ] (optional) RPC enroll
 
 Selection & Show
@@ -11,8 +11,9 @@ Selection & Show
 
 Private Key
 - [ ] Encrypt private key
-- [ ] Add private key
-- [ ] New private key
+- [x] Import private key
+- [x] Generate new private key
+- [ ] Delete private key (Through '...')
 
 Allowlist/Denylist
 - [ ] Add/Remove

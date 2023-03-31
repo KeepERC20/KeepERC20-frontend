@@ -12,8 +12,8 @@
         href="https://automation.chain.link/mumbai/9340155388659824822142057473546063992865515110295145464035554787059319211283"
         target="_blank"
         >>> UpKeep</a
-      ></span
-    >
+      >
+    </span>
   </div>
 </template>
 

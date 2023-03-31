@@ -7,5 +7,16 @@ chrome.action.onClicked.addListener(function (tab) {
     }, function (win) {
         // win represents the Window object from windows API
         // Do something after opening
+
+        chrome.management.get(chrome.runtime.id, function (extensionInfo) {
+            if (extensionInfo.installType === 'development') {
+                // console.log("DEV MODE");
+            }
+        });
     });
+
+    // // Open extension's default_popup in a new tab
+    // chrome.tabs.create({
+    //     url: chrome.runtime.getURL("index.html")
+    // });
 });

@@ -1,6 +1,6 @@
 <script>
 import {
-  getAccount,
+  getAddress,
   getWalletAddress,
   getAllowance,
   approveMax,
@@ -65,7 +65,7 @@ export default {
     },
   },
   mounted() {
-    this.emitter.on("metamask-connect-event", (msg) => {
+    this.emitter.on("account-connect-event", (msg) => {
       this.connected = msg;
       if (this.connected) {
         this.updateValues();
@@ -73,7 +73,7 @@ export default {
       }
     });
 
-    if (getAccount() !== "") {
+    if (getAddress() !== "") {
       this.connected = true;
     }
 
@@ -95,8 +95,8 @@ export default {
       console.log("Update Value");
       if (this.connected) {
         this.erc20 = TOKEN_CONTRACT_ADDR;
-        this.from = getAccount();
-        this.myAccount = getAccount();
+        this.from = getAddress();
+        this.myAccount = getAddress();
         getWalletAddress().then((result) => {
           this.myWallet = result;
           if (result === "0x0000000000000000000000000000000000000000")
