@@ -180,7 +180,7 @@ export default {
         <!-- Connect Button -->
         <button
           v-if="!accountsConnected"
-          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-3 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom login-button"
           @click="connectOnClick"
         >
           Login
@@ -275,5 +275,16 @@ export default {
   border: 2px solid #e5e5e5;
   background-color: #e5e5e5;
   color: black;
+}
+
+.login-button {
+  border: 2px solid #e5e5e5;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+}
+.login-button:hover {
+  border: 2px solid #e5e5e5;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
 }
 </style>
