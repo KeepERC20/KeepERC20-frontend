@@ -43,5 +43,5 @@ Etc
 <!-- - [x] Login -->
 <!-- - [x] Extension popup (not a new window) -->
 <!-- - [x] Webpage (Station) -->
-- [ ] Various ico sizes (use photoshop)
+<!-- - [x] Various ico sizes (use photoshop) -->
 - [ ] Bot (ChatGPT -> type 1, 2, 3 -> send)
