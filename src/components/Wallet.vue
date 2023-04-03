@@ -125,7 +125,7 @@ export default {
       <div class="uk-text-center wrap-top">
         <button
           v-if="!connected"
-          class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom"
+          class="uk-width-1-4@m uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom login-button"
           @click="connectOnClick"
         >
           <span
@@ -230,5 +230,16 @@ export default {
   border: 2px solid #e5e5e5;
   background-color: #e5e5e5;
   color: black;
+}
+
+.login-button {
+  border: 2px solid #ffffff;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+}
+.login-button:hover {
+  border: 2px solid #ffffff;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
 }
 </style>

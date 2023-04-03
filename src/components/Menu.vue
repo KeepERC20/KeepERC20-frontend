@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="logo-outer">
-      <div class="logo pixel-title">KeepERC20</div>
+      <div class="logo pixel-title">KeeperC</div>
     </div>
     <span
       class="pixel-title"
