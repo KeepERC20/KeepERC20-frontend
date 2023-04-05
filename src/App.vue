@@ -3,6 +3,7 @@ import { connectContract } from "./assets/js/interface_request.js";
 import { RouterLink, RouterView } from "vue-router";
 import Menu from "./components/Menu.vue";
 import Wallet from "./components/Wallet.vue";
+import Search from "./components/Search.vue";
 import SendView from "./views/SendView.vue";
 import HistoryView from "./views/HistoryView.vue";
 
@@ -16,6 +17,7 @@ export default {
   components: {
     Menu,
     Wallet,
+    Search,
     SendView,
     HistoryView,
   },
@@ -47,6 +49,11 @@ export default {
           <div style="padding-bottom: 20px">
             <div class="uk-width-1-1">
               <Wallet />
+            </div>
+          </div>
+          <div style="padding-bottom: 20px">
+            <div class="uk-width-1-1">
+              <Search />
             </div>
           </div>
           <div>
