@@ -136,7 +136,7 @@ export default {
 </script>
 
 <template>
-  <div class="uk-width-1-1 routerview-card">
+  <div class="uk-width-1-1 routerview-card uk-margin-small-bottom">
     <div class="uk-width-1-1 routerview-title">
       <div class="title-text"><span>Tasks</span></div>
 

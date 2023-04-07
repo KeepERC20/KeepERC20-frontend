@@ -10,10 +10,10 @@
       </div>
     </div>
 
-    <div class="uk-width-1-1 routerview-card">
+    <div class="uk-width-1-1 routerview-card uk-margin-small-bottom" style="padding-bottom: 20px">
       <div class="uk-text-center wrap-top">
         <form
-          class="uk-width-1-1 uk-search uk-search-default uk-margin-small-bottom"
+          class="uk-width-1-1 uk-search uk-search-default"
           @submit.prevent="performSearch"
         >
           <a
@@ -32,26 +32,22 @@
 
         <button
           v-if="!modalClose"
-          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default uk-margin-small-bottom set-button"
+          class="uk-width-1-1 balance-button pixel-title uk-button uk-button-default set-button"
           href="#modal-key"
           uk-toggle
         >
           Set API KEY
         </button>
-
-        <div
-          v-if="response"
-          class="uk-width-1-1 uk-margin-small-bottom routerview-card"
-        >
-          <div class="uk-width-1-1 routerview-title">
-            <div class="title-text"><span>ADVICE</span></div>
-            <div class="title-text-right"><span>- X</span></div>
-          </div>
-          <div class="uk-width-1-1 routerview-contents">
-            <span class="advice-contents">{{ response }}</span>
-          </div>
-        </div>
       </div>
+    </div>
+  </div>
+  <div v-if="response" class="uk-width-1-1 routerview-card">
+    <div class="uk-width-1-1 routerview-title">
+      <div class="title-text"><span>ADVICE</span></div>
+      <div class="title-text-right"><span>- X</span></div>
+    </div>
+    <div class="uk-width-1-1 routerview-contents">
+      <span class="advice-contents">{{ response }}</span>
     </div>
   </div>
 </template>
